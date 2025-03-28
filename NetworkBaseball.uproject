@@ -5,13 +5,9 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "NetworkChatting",
+			"Name": "NetworkBaseball",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"UMG"
-			]
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

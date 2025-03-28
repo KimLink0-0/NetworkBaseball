@@ -2,13 +2,13 @@
 
 using UnrealBuildTool;
 
-public class NetworkChatting : ModuleRules
+public class NetworkBaseball : ModuleRules
 {
-	public NetworkChatting(ReadOnlyTargetRules Target) : base(Target)
+	public NetworkBaseball(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Slate", "SlateCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
