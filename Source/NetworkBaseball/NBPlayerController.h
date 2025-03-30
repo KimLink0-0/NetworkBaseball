@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "NBPlayerController.generated.h"
 
-class UHUDWidget;
+class UNBHUDWidget;
 
 UCLASS()
 class NETWORKBASEBALL_API ANBPlayerController : public APlayerController
@@ -16,14 +16,18 @@ class NETWORKBASEBALL_API ANBPlayerController : public APlayerController
 public:
 	ANBPlayerController();
 
+	void RequestUpdateScreen() const;
+	void SendMessageToNetwork(const FString& MessageToSend);
+	TObjectPtr<UNBHUDWidget> GetHUDWidgetInstance() const { return HUDWidgetInstance; }
 	
 protected:
 	// Widget
-	TSoftClassPtr<UHUDWidget> HUDWidgetClass;
-	TObjectPtr<UHUDWidget> HUDWidgetInstance;
-
-	//
 	void InitWidget();
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HUD")
+	TSubclassOf<UUserWidget> HUDWidgetClass;
+	UPROPERTY()
+	TObjectPtr<UNBHUDWidget> HUDWidgetInstance;
+	
 
 	// LifeCycle
 	virtual void BeginPlay() override;

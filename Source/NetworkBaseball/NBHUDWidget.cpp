@@ -3,3 +3,10 @@
 
 #include "NBHUDWidget.h"
 
+void UNBHUDWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	ensure(ProgressWidget);
+	ensure(SBOScreenWidget);
+}

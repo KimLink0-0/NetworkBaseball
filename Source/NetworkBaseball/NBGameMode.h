@@ -24,6 +24,7 @@ public:
 	uint8 GetMaxBallCount() const { return MaxBallCount; }
 
 	//
+	bool CheckCanContinueInning(const FName& UserName) const;
 	FString GenerateComputerNumber() const;
 	FString JudgePlayResult(const FName& UserName);
 	FString EndGame();
@@ -40,7 +41,6 @@ public:
 	void ResetOutCount(const FName& UserName);
 	void ResetHitCount(const FName& UserName);
 
-	bool CheckCanContinueInning(const FName& UserName) const;
 	void AssignDefaultUserName(const APlayerController* NewPlayer);
 	void AddPlayerStatesToMap(const APlayerController* NewPlayer);
 

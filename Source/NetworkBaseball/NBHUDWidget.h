@@ -13,5 +13,12 @@ UCLASS()
 class NETWORKBASEBALL_API UNBHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UUserWidget> ProgressWidget;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UUserWidget> SBOScreenWidget;
+
+	virtual void NativeConstruct() override;
 };

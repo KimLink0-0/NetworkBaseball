@@ -14,6 +14,17 @@ ANBGameMode::ANBGameMode()
 	
 }
 
+bool ANBGameMode::CheckCanContinueInning(const FName& UserName) const
+{
+	auto* PlayerState = GetPlayerStates(UserName);
+	if (PlayerState)
+	{
+		return PlayerState->GetOutCount() < GetMaxOutCount();
+	}
+
+	return false;
+}
+
 FString ANBGameMode::GenerateComputerNumber() const
 {
 	TArray<int32> ValidRangeNumbers;
@@ -255,17 +266,6 @@ void ANBGameMode::ResetHitCount(const FName& UserName)
 	{
 		PlayerState->SetHitCount(0);
 	}
-}
-
-bool ANBGameMode::CheckCanContinueInning(const FName& UserName) const
-{
-	auto* PlayerState = GetPlayerStates(UserName);
-	if (PlayerState)
-	{
-		return PlayerState->GetOutCount() < GetMaxOutCount();
-	}
-
-	return false;
 }
 
 void ANBGameMode::AssignDefaultUserName(const APlayerController* NewPlayer)
