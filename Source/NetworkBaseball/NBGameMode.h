@@ -17,7 +17,7 @@ public:
 	ANBGameMode();
 
 	// Getter & Setter
-	ANBPlayerState* GetPlayerStates(const FName& PlayerName) const { return PlayerStates.FindRef(PlayerName); }
+	ANBPlayerState* GetPlayerStates(const FName& UserName) const { return PlayerStates.FindRef(UserName); }
 	uint8 GetMaxInning() const { return MaxInning; }
 	uint8 GetMaxOutCount() const { return MaxOutCount; }
 	uint8 GetMaxStrikeCount() const { return MaxStrikeCount; }
@@ -25,19 +25,24 @@ public:
 
 	//
 	FString GenerateComputerNumber() const;
-	FString JudgePlayResult(const FName& PlayerName);
+	FString JudgePlayResult(const FName& UserName);
 	FString EndGame();
 
-	void AddInningCount(const FName& PlayerName);
-	void AddOutCount(const FName& PlayerName);
-	void AddStrikeCount(const FName& PlayerName);
-	void AddBallCount(const FName& PlayerName);
+	void AddInningCount(const FName& UserName);
+	void AddOutCount(const FName& UserName);
+	void AddStrikeCount(const FName& UserName);
+	void AddBallCount(const FName& UserName);
+	void AddHitCount(const FName& UserName);
+	void AddGameScore(const FName& UserName);
 
-	void ResetBallCount(const FName& PlayerName);
-	void ResetStrikeCount(const FName& PlayerName);
-	void ResetOutCount(const FName& PlayerName);
+	void ResetBallCount(const FName& UserName);
+	void ResetStrikeCount(const FName& UserName);
+	void ResetOutCount(const FName& UserName);
+	void ResetHitCount(const FName& UserName);
 
-	bool CheckCanContinueInning(const FName& PlayerName) const;
+	bool CheckCanContinueInning(const FName& UserName) const;
+	void AssignDefaultUserName(const APlayerController* NewPlayer);
+	void AddPlayerStatesToMap(const APlayerController* NewPlayer);
 
 protected:
 	TMap<FName, ANBPlayerState*> PlayerStates;
@@ -53,5 +58,6 @@ protected:
 	UPROPERTY()
 	uint8 MaxBallCount = 4;
 };
+
 
 

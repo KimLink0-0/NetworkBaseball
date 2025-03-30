@@ -36,10 +36,12 @@ FString ANBGameMode::GenerateComputerNumber() const
 	return GeneratedResult;
 }
 
-FString ANBGameMode::JudgePlayResult(const FName& PlayerName)
+FString ANBGameMode::JudgePlayResult(const FName& UserName)
 {
 	uint8 StrikeCount = 0, BallCount = 0;
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	int32 HitCount = 0;
+	
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		FString UserPitchString = PlayerState->GetUserPitchString();
@@ -49,23 +51,38 @@ FString ANBGameMode::JudgePlayResult(const FName& PlayerName)
 		{
 			if (ComputerPitchString[i] == UserPitchString[i])
 			{
-				StrikeCount++;
+				HitCount++;
 			}
 			else
 			{
 				const FString UserNumber = FString::Chr(UserPitchString[i]);
 				if (ComputerPitchString.Contains(UserNumber))
 				{
+					StrikeCount++;
+				}
+				else
+				{
 					BallCount++;
 				}
+			}
+		}
+		for (int32 i = 0; i < HitCount; ++i)
+		{
+			if (CheckCanContinueInning(UserName))
+			{
+				AddHitCount(UserName);
+			}
+			else
+			{
+				break;
 			}
 		}
 
 		for (int32 i = 0 ; i < StrikeCount ; i++)
 		{
-			if (CheckCanContinueInning(PlayerName))
+			if (CheckCanContinueInning(UserName))
 			{
-				AddStrikeCount(PlayerName);
+				AddStrikeCount(UserName);
 			}
 			else
 			{
@@ -74,9 +91,9 @@ FString ANBGameMode::JudgePlayResult(const FName& PlayerName)
 		}
 		for (int32 i = 0 ; i < BallCount ; i++)
 		{
-			if (CheckCanContinueInning(PlayerName))
+			if (CheckCanContinueInning(UserName))
 			{
-				AddBallCount(PlayerName);	
+				AddBallCount(UserName);	
 			}
 			else
 			{
@@ -86,7 +103,8 @@ FString ANBGameMode::JudgePlayResult(const FName& PlayerName)
 
 		const uint8 StrikeCountResult = PlayerState->GetStrikeCount();
 		const uint8 BallCountResult = PlayerState->GetBallCount();
-		return FString::Printf(TEXT("%d Strike, %d Ball"), StrikeCountResult, BallCountResult);
+		const int32 HitCountResult = PlayerState->GetHitCount();
+		return FString::Printf(TEXT("%d Strike, %d Ball, %d HitCount"), StrikeCountResult, BallCountResult, HitCountResult);
 	}
 	else
 	{
@@ -103,9 +121,9 @@ FString ANBGameMode::EndGame()
 	return GameResult;
 }
 
-void ANBGameMode::AddInningCount(const FName& PlayerName)
+void ANBGameMode::AddInningCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		const uint8 InningCount = PlayerState->GetInningCount();
@@ -118,19 +136,22 @@ void ANBGameMode::AddInningCount(const FName& PlayerName)
 			PlayerState->SetInningCount(InningCount + 1);
 		}
 	}
-	ResetOutCount(PlayerName); 
+	AddGameScore(UserName);
+	ResetOutCount(UserName);
+	ResetStrikeCount(UserName);
+	ResetBallCount(UserName);
+	ResetHitCount(UserName);
 }
 
-void ANBGameMode::AddOutCount(const FName& PlayerName)
+void ANBGameMode::AddOutCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		const uint8 OutCount = PlayerState->GetOutCount();
 		if (OutCount == GetMaxOutCount())
 		{
-			AddInningCount(PlayerName);
-			ResetOutCount(PlayerName);
+			AddInningCount(UserName);
 		}
 		else
 		{
@@ -140,16 +161,16 @@ void ANBGameMode::AddOutCount(const FName& PlayerName)
 	}
 }
 
-void ANBGameMode::AddStrikeCount(const FName& PlayerName)
+void ANBGameMode::AddStrikeCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		const uint8 StrikeCount = PlayerState->GetStrikeCount();
 		if (StrikeCount == GetMaxStrikeCount())
 		{
-			AddOutCount(PlayerName);
-			ResetStrikeCount(PlayerName);
+			AddOutCount(UserName);
+			ResetStrikeCount(UserName);
 		}
 		else
 		{
@@ -159,16 +180,16 @@ void ANBGameMode::AddStrikeCount(const FName& PlayerName)
 	}
 }
 
-void ANBGameMode::AddBallCount(const FName& PlayerName)
+void ANBGameMode::AddBallCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		const uint8 BallCount = PlayerState->GetBallCount();
 		if (BallCount == GetMaxBallCount())
 		{
-			AddStrikeCount(PlayerName);
-			ResetBallCount(PlayerName);
+			AddStrikeCount(UserName);
+			ResetBallCount(UserName);
 		}
 		else
 		{
@@ -178,54 +199,77 @@ void ANBGameMode::AddBallCount(const FName& PlayerName)
 	}
 }
 
-void ANBGameMode::ResetBallCount(const FName& PlayerName)
+void ANBGameMode::AddHitCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
+	if (PlayerState)
+	{
+		const int32 HitCount = PlayerState->GetHitCount();
+		PlayerState->SetHitCount(HitCount + 1);
+	}
+}
+
+void ANBGameMode::AddGameScore(const FName& UserName)
+{
+	auto* PlayerState = GetPlayerStates(UserName);
+	if (PlayerState)
+	{
+		const int32 HitCount = PlayerState->GetHitCount();
+		const int32 AwardScore = FMath::Max(0, HitCount-3);
+		const int32 CurrentScore = PlayerState->GetGameScore();
+		PlayerState->SetGameScore(CurrentScore + AwardScore);
+	}
+}
+
+void ANBGameMode::ResetBallCount(const FName& UserName)
+{
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		PlayerState->SetBallCount(0);
 	}
 }
 
-void ANBGameMode::ResetStrikeCount(const FName& PlayerName)
+void ANBGameMode::ResetStrikeCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		PlayerState->SetStrikeCount(0);
 	}
 }
 
-void ANBGameMode::ResetOutCount(const FName& PlayerName)
+void ANBGameMode::ResetOutCount(const FName& UserName)
 {
-	auto* PlayerState = GetPlayerStates(PlayerName);
+	auto* PlayerState = GetPlayerStates(UserName);
 	if (PlayerState)
 	{
 		PlayerState->SetOutCount(0);
 	}
 }
 
-bool ANBGameMode::CheckCanContinueInning(const FName& PlayerName) const
+void ANBGameMode::ResetHitCount(const FName& UserName)
 {
-	bool bCanContinue;
-	
-	auto* PlayerState = GetPlayerStates(PlayerName);
-	if (PlayerState->GetOutCount() == GetMaxOutCount())
+	auto* PlayerState = GetPlayerStates(UserName);
+	if (PlayerState)
 	{
-		bCanContinue = false;
+		PlayerState->SetHitCount(0);
 	}
-	else
-	{
-		bCanContinue = true;
-	}
-
-	return bCanContinue;
 }
 
-void ANBGameMode::PostLogin(APlayerController* NewPlayer)
+bool ANBGameMode::CheckCanContinueInning(const FName& UserName) const
 {
-	Super::PostLogin(NewPlayer);
+	auto* PlayerState = GetPlayerStates(UserName);
+	if (PlayerState)
+	{
+		return PlayerState->GetOutCount() < GetMaxOutCount();
+	}
 
+	return false;
+}
+
+void ANBGameMode::AssignDefaultUserName(const APlayerController* NewPlayer)
+{
 	int32 ClientConnectionCount;
 	auto* NetDriver = NewPlayer->GetNetDriver();
 	if (NetDriver)
@@ -249,6 +293,29 @@ void ANBGameMode::PostLogin(APlayerController* NewPlayer)
 			NB_LOG(LogBaseBall, Log, TEXT("UserName:%s"), *PlayerState->GetUserName().ToString());
 		}
 	}
+}
+
+void ANBGameMode::AddPlayerStatesToMap(const APlayerController* NewPlayer)
+{
+	auto* PlayerController = Cast<ANBPlayerController>(NewPlayer);
+	if (PlayerController)
+	{
+		auto* PlayerState = PlayerController->GetPlayerState<ANBPlayerState>();
+		if (PlayerState)
+		{
+			const FName UserName = PlayerState->GetUserName();
+			PlayerStates.Add(UserName, PlayerState);
+		}
+	}
+}
+
+void ANBGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	AssignDefaultUserName(NewPlayer);
+	AddPlayerStatesToMap(NewPlayer);
+
 }
 
 

@@ -29,6 +29,10 @@ public:
 	void SetStrikeCount(const uint8& NewCount) { StrikeCount = NewCount; }
 	uint8 GetBallCount() const { return BallCount; }
 	void SetBallCount(const uint8& NewCount) { BallCount = NewCount; }
+	int32 GetHitCount() const { return HitCount; }
+	void SetHitCount(const int32& NewCount) { HitCount = NewCount; }
+	int32 GetGameScore() const { return GameScore; };
+	void SetGameScore(const int32& NewScore) { GameScore = NewScore; }
 	
 	FString GetUserPitchString() const { return UserPitchString; }
 	void SetUserPitchString(const FString& NewNumberString) { UserPitchString = NewNumberString; }
@@ -50,6 +54,10 @@ protected:
 	uint8 StrikeCount;
 	UPROPERTY()
 	uint8 BallCount;
+	UPROPERTY()
+	int32 HitCount;
+	UPROPERTY()
+	int32 GameScore;
 
 	UPROPERTY()
 	FString UserPitchString;
