@@ -18,29 +18,12 @@ public:
 
 	// Getter & Setter
 	ANBPlayerState* GetPlayerStates(const FName& UserName) const { return PlayerStates.FindRef(UserName); }
-	uint8 GetMaxInning() const { return MaxInning; }
-	uint8 GetMaxOutCount() const { return MaxOutCount; }
-	uint8 GetMaxStrikeCount() const { return MaxStrikeCount; }
-	uint8 GetMaxBallCount() const { return MaxBallCount; }
 
-	//
-	bool CheckCanContinueInning(const FName& UserName) const;
+	// Game Rule
 	FString GenerateComputerNumber() const;
 	FString JudgePlayResult(const FName& UserName);
-	FString EndGame();
-
-	void AddInningCount(const FName& UserName);
-	void AddOutCount(const FName& UserName);
-	void AddStrikeCount(const FName& UserName);
-	void AddBallCount(const FName& UserName);
-	void AddHitCount(const FName& UserName);
-	void AddGameScore(const FName& UserName);
-
-	void ResetBallCount(const FName& UserName);
-	void ResetStrikeCount(const FName& UserName);
-	void ResetOutCount(const FName& UserName);
-	void ResetHitCount(const FName& UserName);
-
+	
+	// Add Player
 	void AssignDefaultUserName(const APlayerController* NewPlayer);
 	void AddPlayerStatesToMap(const APlayerController* NewPlayer);
 
@@ -49,14 +32,6 @@ protected:
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-	UPROPERTY()
-	uint8 MaxInning = 9;
-	UPROPERTY()
-	uint8 MaxOutCount = 3;
-	UPROPERTY()
-	uint8 MaxStrikeCount = 3;
-	UPROPERTY()
-	uint8 MaxBallCount = 4;
 };
 
 

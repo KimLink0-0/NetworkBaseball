@@ -20,48 +20,23 @@ public:
 	// Getter && Setter
 	FName GetUserName() const { return UserName; }
 	void SetUserName(const FName& NewName) { UserName = NewName; }
-	
-	uint8 GetInningCount() const { return InningCount; }
-	void SetInningCount(const uint8& NewCount) { InningCount = NewCount; }
-	uint8 GetOutCount() const { return OutCount; }
-	void SetOutCount(const uint8& NewCount) { OutCount = NewCount; }
-	uint8 GetStrikeCount() const { return StrikeCount; }
-	void SetStrikeCount(const uint8& NewCount) { StrikeCount = NewCount; }
-	uint8 GetBallCount() const { return BallCount; }
-	void SetBallCount(const uint8& NewCount) { BallCount = NewCount; }
-	int32 GetHitCount() const { return HitCount; }
-	void SetHitCount(const int32& NewCount) { HitCount = NewCount; }
-	int32 GetGameScore() const { return GameScore; };
-	void SetGameScore(const int32& NewScore) { GameScore = NewScore; }
-	
-	FString GetUserPitchString() const { return UserPitchString; }
-	void SetUserPitchString(const FString& NewNumberString) { UserPitchString = NewNumberString; }
-	FString GetComputerPitchString() const { return ComputerPitchString; }
-	void SetComputerPitchString(const FString& NewNumberString) { ComputerPitchString = NewNumberString; }
-
-	//
-	void RequestGenerateComputerPitch();
+	uint8 GetTurnCount() const { return TurnCount; }
+	void SetTurnCount(uint8 NewTurnCount) { TurnCount = NewTurnCount; }
+	FString GetPlayerInputValue() const { return PlayerInputValue; }
+	void SetPlayerInputValue(const FString& NewInputValue) { PlayerInputValue = NewInputValue; }
+	uint8 GetWinScore() const { return WinScore; }
+	void SetWinScore(uint8 NewWinScore) { WinScore = NewWinScore; }
 	
 protected:
 	UPROPERTY()
 	FName UserName;
-	
-	UPROPERTY()
-	uint8 InningCount;
-	UPROPERTY()
-	uint8 OutCount;
-	UPROPERTY()
-	uint8 StrikeCount;
-	UPROPERTY()
-	uint8 BallCount;
-	UPROPERTY()
-	int32 HitCount;
-	UPROPERTY()
-	int32 GameScore;
 
 	UPROPERTY()
-	FString UserPitchString;
-	UPROPERTY()
-	FString ComputerPitchString;
+	uint8 TurnCount;
 	
+	UPROPERTY()
+	FString PlayerInputValue;
+
+	UPROPERTY()
+	uint8 WinScore;
 };

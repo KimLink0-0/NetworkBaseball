@@ -4,7 +4,7 @@
 #include "NBPlayerController.h"
 
 #include "NBHUDWidget.h"
-#include "NBSBOScreenWidget.h"
+#include "NBScoreWidget.h"
 
 ANBPlayerController::ANBPlayerController()
 {
@@ -18,22 +18,7 @@ ANBPlayerController::ANBPlayerController()
 
 }
 
-void ANBPlayerController::RequestUpdateScreen() const
-{
-	auto* SBOScreen = Cast<UNBSBOScreenWidget>(GetHUDWidgetInstance()->SBOScreenWidget);
-	if (SBOScreen)
-	{
-		SBOScreen->UpdateScreen();
-	}
-}
-
-void ANBPlayerController::SendMessageToNetwork(const FString& MessageToSend)
-{
-	
-}
-
-
-void ANBPlayerController::InitWidget()
+void ANBPlayerController::NewWidget()
 {
 	if (HUDWidgetClass)
 	{
@@ -45,14 +30,19 @@ void ANBPlayerController::InitWidget()
 	}
 }
 
+void ANBPlayerController::InitWidget()
+{
+	
+}
+
 void ANBPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (IsLocalController())
 	{
+		NewWidget();
 		InitWidget();
-		RequestUpdateScreen();
 	}
 	bShowMouseCursor = true;
 	

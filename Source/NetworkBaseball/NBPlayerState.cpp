@@ -8,25 +8,14 @@
 
 ANBPlayerState::ANBPlayerState()
 {
-	UserName = FName(FString::Printf(TEXT("")));
-	InningCount = 1;
-	StrikeCount = 0;
-	BallCount = 0;
-	OutCount = 0;
-	UserPitchString = TEXT("");
-	ComputerPitchString = TEXT("");
-	
 	bOnlyRelevantToOwner = true;
+	
+	UserName = FName(FString::Printf(TEXT("")));
+	TurnCount = 1;
+	PlayerInputValue = TEXT("");
+	WinScore = 0;
+	
 }
 
-void ANBPlayerState::RequestGenerateComputerPitch()
-{
-	auto* GameMode = Cast<ANBGameMode>(GetWorld()->GetAuthGameMode());
-	if (GameMode)
-	{
-		FString GenResult = GameMode->GenerateComputerNumber();
-		SetComputerPitchString(GenResult);
-	}
-}
 
 

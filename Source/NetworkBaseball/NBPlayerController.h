@@ -16,12 +16,11 @@ class NETWORKBASEBALL_API ANBPlayerController : public APlayerController
 public:
 	ANBPlayerController();
 
-	void RequestUpdateScreen() const;
-	void SendMessageToNetwork(const FString& MessageToSend);
 	TObjectPtr<UNBHUDWidget> GetHUDWidgetInstance() const { return HUDWidgetInstance; }
 	
 protected:
 	// Widget
+	void NewWidget();
 	void InitWidget();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HUD")
 	TSubclassOf<UUserWidget> HUDWidgetClass;

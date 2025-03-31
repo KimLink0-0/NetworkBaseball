@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NBGameProgressWidget.h"
+#include "NBProgressWidget.h"
 
 #include "NBPlayerController.h"
 #include "NBPlayerState.h"
 #include "Components/Button.h"
 #include "Components/EditableText.h"
 
-void UNBGameProgressWidget::ResetInputMessage() const
+void UNBProgressWidget::ResetInputMessage() const
 {
-	EditableText->SetText(FText::FromString(TEXT("")));
+	EditableTextWidget->SetText(FText::FromString(TEXT("")));
 }
 
-void UNBGameProgressWidget::SendMessageOnEnter(const FText& MessageFormText, ETextCommit::Type CommitMethod)
+void UNBProgressWidget::SendMessageOnEnter(const FText& MessageFormText, ETextCommit::Type CommitMethod)
 {
 	if (CommitMethod == ETextCommit::OnEnter && !MessageFormText.IsEmpty())
 	{
@@ -29,12 +29,11 @@ void UNBGameProgressWidget::SendMessageOnEnter(const FText& MessageFormText, ETe
 		}
 
 		const FString MessageToSend = FString::Printf(TEXT("[%s]:%s"), *PlayerState->GetUserName().ToString(), *MessageFormText.ToString());
-		PlayerController->SendMessageToNetwork(MessageToSend);
 		ResetInputMessage();
 	}
 }
 
-void UNBGameProgressWidget::SendMessageOnClick()
+void UNBProgressWidget::SendMessageOnClick()
 {
 	auto* PlayerController = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (!PlayerController)
@@ -47,32 +46,30 @@ void UNBGameProgressWidget::SendMessageOnClick()
 		return;
 	}
 
-	const FString MessageToSend = FString::Printf(TEXT("[%s]:%s"), *PlayerState->GetUserName().ToString(), *EditableText->GetText().ToString());
+	const FString MessageToSend = FString::Printf(TEXT("[%s]:%s"), *PlayerState->GetUserName().ToString(), *EditableTextWidget->GetText().ToString());
 	if (!MessageToSend.IsEmpty())
 	{
-		PlayerController->SendMessageToNetwork(MessageToSend);
 		ResetInputMessage();
 	}
 }
 
-void UNBGameProgressWidget::NativeConstruct()
+void UNBProgressWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ensure(ComputerPitch);
-	ensure(UserInput);
-	ensure(EditableText);
+	ensure(GameStatusWidget);
+	ensure(ChatLogWidget);
+	ensure(EditableTextWidget);
+	ensure(SendButtonWidget);
 
 	// 이벤트 바인딩
-	if (EditableText)
+	if (EditableTextWidget)
 	{
-		// if SetText = Hi, Failed to send login message.
-		EditableText->SetText(FText::FromString(TEXT("Hi")));
-		EditableText->OnTextCommitted.AddDynamic(this, &UNBGameProgressWidget::SendMessageOnEnter);
+		EditableTextWidget->OnTextCommitted.AddDynamic(this, &UNBProgressWidget::SendMessageOnEnter);
 	}
 
-	if (SendButton)
+	if (SendButtonWidget)
 	{
-		SendButton->OnClicked.AddDynamic(this, &UNBGameProgressWidget::SendMessageOnClick);
+		SendButtonWidget->OnClicked.AddDynamic(this, &UNBProgressWidget::SendMessageOnClick);
 	}
 }

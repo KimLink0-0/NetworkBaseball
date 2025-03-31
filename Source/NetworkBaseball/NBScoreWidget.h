@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "NBSBOScreenWidget.generated.h"
+#include "NBScoreWidget.generated.h"
 
 class UImage;
 
 UCLASS()
-class NETWORKBASEBALL_API UNBSBOScreenWidget : public UUserWidget
+class NETWORKBASEBALL_API UNBScoreWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

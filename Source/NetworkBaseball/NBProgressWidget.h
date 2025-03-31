@@ -4,19 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "NBGameProgressWidget.generated.h"
+#include "NBProgressWidget.generated.h"
 
 class UTextBlock;
 class UEditableText;
 class UButton;
 
 UCLASS()
-class NETWORKBASEBALL_API UNBGameProgressWidget : public UUserWidget
+class NETWORKBASEBALL_API UNBProgressWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	const FString& GetInputMessage() const { return InputMessage; }
 	void ResetInputMessage() const;
 	
 	UFUNCTION()
@@ -26,16 +25,14 @@ public:
 	
 
 protected:
-	FString InputMessage;
-	
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ComputerPitch;
+	TObjectPtr<UTextBlock> GameStatusWidget;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> UserInput;
+	TObjectPtr<UTextBlock> ChatLogWidget;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UEditableText> EditableText;
+	TObjectPtr<UEditableText> EditableTextWidget;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> SendButton;
+	TObjectPtr<UButton> SendButtonWidget;
 };
