@@ -3,7 +3,6 @@
 
 #include "NBPlayerState.h"
 
-#include "NBGameMode.h"
 
 
 ANBPlayerState::ANBPlayerState()

@@ -6,9 +6,6 @@
 #include "GameFramework/PlayerState.h"
 #include "NBPlayerState.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class NETWORKBASEBALL_API ANBPlayerState : public APlayerState
 {
@@ -21,11 +18,11 @@ public:
 	FName GetUserName() const { return UserName; }
 	void SetUserName(const FName& NewName) { UserName = NewName; }
 	uint8 GetTurnCount() const { return TurnCount; }
-	void SetTurnCount(uint8 NewTurnCount) { TurnCount = NewTurnCount; }
+	void SetTurnCount(const uint8& NewTurnCount) { TurnCount = NewTurnCount; }
 	FString GetPlayerInputValue() const { return PlayerInputValue; }
 	void SetPlayerInputValue(const FString& NewInputValue) { PlayerInputValue = NewInputValue; }
 	uint8 GetWinScore() const { return WinScore; }
-	void SetWinScore(uint8 NewWinScore) { WinScore = NewWinScore; }
+	void SetWinScore(const uint8& NewWinScore) { WinScore = NewWinScore; }
 	
 protected:
 	UPROPERTY()

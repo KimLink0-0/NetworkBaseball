@@ -15,6 +15,7 @@ class NETWORKBASEBALL_API UNBScoreWidget : public UUserWidget
 
 public:
 	void UpdateScreen();
+	void ResetScreen();
 
 protected:
 	virtual void NativeConstruct() override;

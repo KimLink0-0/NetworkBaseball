@@ -6,9 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "NBHUDWidget.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class NETWORKBASEBALL_API UNBHUDWidget : public UUserWidget
 {

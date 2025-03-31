@@ -20,7 +20,7 @@ public:
 	ANBPlayerState* GetPlayerStates(const FName& UserName) const { return PlayerStates.FindRef(UserName); }
 
 	// Game Rule
-	FString GenerateComputerNumber() const;
+	void GenerateComputerNumber() const;
 	FString JudgePlayResult(const FName& UserName);
 	
 	// Add Player
