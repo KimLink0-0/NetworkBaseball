@@ -27,12 +27,11 @@ public:
 	bool CheckCanContinueInning(const FName& UserName) const;
 	FString GenerateComputerNumber() const;
 	FString JudgePlayResult(const FName& UserName);
-	FString EndGame();
 
-	void AddInningCount(const FName& UserName);
-	void AddOutCount(const FName& UserName);
-	void AddStrikeCount(const FName& UserName);
-	void AddBallCount(const FName& UserName);
+	bool AddInningCount(const FName& UserName);
+	bool AddOutCount(const FName& UserName);
+	bool AddStrikeCount(const FName& UserName);
+	bool AddBallCount(const FName& UserName);
 	void AddHitCount(const FName& UserName);
 	void AddGameScore(const FName& UserName);
 
@@ -43,6 +42,8 @@ public:
 
 	void AssignDefaultUserName(const APlayerController* NewPlayer);
 	void AddPlayerStatesToMap(const APlayerController* NewPlayer);
+	void InitNBGame(const APlayerController* NewPlayer);
+	void EndNBGame(const FName& UserName);
 
 protected:
 	TMap<FName, ANBPlayerState*> PlayerStates;

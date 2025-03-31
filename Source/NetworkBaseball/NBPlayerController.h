@@ -16,8 +16,19 @@ class NETWORKBASEBALL_API ANBPlayerController : public APlayerController
 public:
 	ANBPlayerController();
 
+	// RPC 관련
+	UFUNCTION(Server, Reliable)
+	void ServerRPCRequestSetUserPitch(const FString& Message);
+	UFUNCTION(Server, Reliable)
+	void ServerRPCRequestJudgePlay(const FName& UserName);
+	UFUNCTION(Client, Reliable)
+	void ClientRPCRequestUpdateWidget();
+
+	void RequestJudgePlay(const FName& UserName);
 	void RequestUpdateScreen() const;
+	void RequestUpdateProgress() const;
 	void SendMessageToNetwork(const FString& MessageToSend);
+	void SetUserPitch(const FString& Message);
 	TObjectPtr<UNBHUDWidget> GetHUDWidgetInstance() const { return HUDWidgetInstance; }
 	
 protected:

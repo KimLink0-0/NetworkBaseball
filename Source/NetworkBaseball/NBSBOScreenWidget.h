@@ -7,6 +7,7 @@
 #include "NBSBOScreenWidget.generated.h"
 
 class UImage;
+class UTextBlock;
 
 UCLASS()
 class NETWORKBASEBALL_API UNBSBOScreenWidget : public UUserWidget
@@ -18,6 +19,9 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> GameScoreWidget;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> StrikeIcon1;
@@ -41,6 +45,9 @@ protected:
 	TObjectPtr<UImage> OutIcon2;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> OutIcon3;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> PlayResultWidget;
 
 	TArray<TObjectPtr<UImage>> StrikeIcons;
 	TArray<TObjectPtr<UImage>> BallIcons;

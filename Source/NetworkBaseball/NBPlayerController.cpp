@@ -3,8 +3,12 @@
 
 #include "NBPlayerController.h"
 
+#include "NBGameMode.h"
+#include "NBGameProgressWidget.h"
 #include "NBHUDWidget.h"
+#include "NBPlayerState.h"
 #include "NBSBOScreenWidget.h"
+#include "NetworkBaseball.h"
 
 ANBPlayerController::ANBPlayerController()
 {
@@ -18,20 +22,91 @@ ANBPlayerController::ANBPlayerController()
 
 }
 
+void ANBPlayerController::ServerRPCRequestSetUserPitch_Implementation(const FString& Message)
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"))
+	
+	SetUserPitch(Message);
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"))
+}
+
+void ANBPlayerController::ServerRPCRequestJudgePlay_Implementation(const FName& UserName)
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"))
+
+	RequestJudgePlay(UserName);
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"))
+}
+
+void ANBPlayerController::ClientRPCRequestUpdateWidget_Implementation()
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"))
+
+	RequestUpdateScreen();
+	RequestUpdateProgress();
+	
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"))
+}
+
+void ANBPlayerController::RequestJudgePlay(const FName& UserName)
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"))
+	
+	auto* GameMode = Cast<ANBGameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
+	{
+		auto* NBPlayerState = GetPlayerState<ANBPlayerState>();
+		if (NBPlayerState)
+		{
+			const FString PlayResult = GameMode->JudgePlayResult(UserName);
+			NBPlayerState->SetPlayResult(PlayResult);
+		}
+	}
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"))
+}
+
 void ANBPlayerController::RequestUpdateScreen() const
 {
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"))
+	
 	auto* SBOScreen = Cast<UNBSBOScreenWidget>(GetHUDWidgetInstance()->SBOScreenWidget);
 	if (SBOScreen)
 	{
 		SBOScreen->UpdateScreen();
 	}
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"))
+}
+
+void ANBPlayerController::RequestUpdateProgress() const
+{
+	auto* Progress = Cast<UNBGameProgressWidget>(GetHUDWidgetInstance()->ProgressWidget);
+	if (Progress)
+	{
+		Progress->UpdateDisplayInfo();
+	}
 }
 
 void ANBPlayerController::SendMessageToNetwork(const FString& MessageToSend)
 {
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"))
 	
+	ServerRPCRequestSetUserPitch(MessageToSend);
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"))
 }
 
+void ANBPlayerController::SetUserPitch(const FString& Message)
+{
+	auto* NBPlayerState = GetPlayerState<ANBPlayerState>();
+	if (NBPlayerState)
+	{
+		NBPlayerState->SetUserPitchString(Message);
+	}
+}
 
 void ANBPlayerController::InitWidget()
 {
@@ -52,7 +127,16 @@ void ANBPlayerController::BeginPlay()
 	if (IsLocalController())
 	{
 		InitWidget();
-		RequestUpdateScreen();
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(
+			TimerHandle,
+			this,
+			&ANBPlayerController::ClientRPCRequestUpdateWidget,
+			0.2f,
+			false
+		);
+		
 	}
 	bShowMouseCursor = true;
 	

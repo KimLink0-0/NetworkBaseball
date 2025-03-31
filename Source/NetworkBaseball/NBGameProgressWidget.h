@@ -17,7 +17,14 @@ class NETWORKBASEBALL_API UNBGameProgressWidget : public UUserWidget
 
 public:
 	const FString& GetInputMessage() const { return InputMessage; }
+	
 	void ResetInputMessage() const;
+	void UpdateInputMessageLog();
+	void UpdateComputerPitch() const;
+	void AddInputMessage(const FString& NewMessage);
+	bool JudgePlayerPitch(const FString& NewtMessage);
+
+	void UpdateDisplayInfo();
 	
 	UFUNCTION()
 	void SendMessageOnEnter(const FText& MessageFormText, ETextCommit::Type CommitMethod);
@@ -27,6 +34,8 @@ public:
 
 protected:
 	FString InputMessage;
+	TArray<FString> InputMessages;
+	FString InputMessageLog;
 	
 	virtual void NativeConstruct() override;
 
@@ -38,4 +47,5 @@ protected:
 	TObjectPtr<UEditableText> EditableText;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> SendButton;
+	
 };
