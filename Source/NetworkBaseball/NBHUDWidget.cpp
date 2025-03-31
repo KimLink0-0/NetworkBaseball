@@ -8,5 +8,5 @@ void UNBHUDWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	ensure(ProgressWidget);
-	ensure(SBOScreenWidget);
+	ensure(ScoreWidget);
 }

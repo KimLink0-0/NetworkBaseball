@@ -18,8 +18,8 @@ ANBGameMode::ANBGameMode()
 
 void ANBGameMode::GenerateComputerNumber() const
 {
-	auto* GameState = GetGameState<ANBGameState>();
-	if (GameState)
+	auto* NBGameState = GetGameState<ANBGameState>();
+	if (NBGameState)
 	{
 		TArray<int32> ValidRangeNumbers;
 		for (int32 i = 1; i <= 9; i++)
@@ -37,29 +37,29 @@ void ANBGameMode::GenerateComputerNumber() const
 			GeneratedResult.Append(FString::FromInt(ValidRangeNumbers[Index]));
 			ValidRangeNumbers.RemoveAt(Index);
 		}
-		GameState->SetComputerNumber(GeneratedResult);
+		NBGameState->SetComputerNumber(GeneratedResult);
 	}
 }
 
-FString ANBGameMode::JudgePlayResult(const FName& UserName)
+FString ANBGameMode::JudgePlayResult(const FName& UserName) const
 {
-	auto* PlayerState = GetPlayerStates(UserName);
-	if (!PlayerState)
+	auto* NBPlayerState = GetPlayerStates(UserName);
+	if (!NBPlayerState)
 	{
-		return FString::Printf(TEXT("%s not found %s"), *PlayerState->GetUserName().ToString(), *PlayerState->GetName());
+		return FString::Printf(TEXT("%s not found %s"), *NBPlayerState->GetUserName().ToString(), *NBPlayerState->GetName());
 	}
-	auto* GameState = GetGameState<ANBGameState>();
-	if (!GameState)
+	auto* NBGameState = GetGameState<ANBGameState>();
+	if (!NBGameState)
 	{
-		return FString::Printf(TEXT("%s not found %s"), *PlayerState->GetUserName().ToString(), *GameState->GetName());
+		return FString::Printf(TEXT("%s not found %s"), *NBPlayerState->GetUserName().ToString(), *NBGameState->GetName());
 	}
 	
 	uint8 Strike = 0, Ball = 0, Out = 0;
 		
 	for (int32 i = 0; i < 3; ++i)
 	{
-		FString PlayerNumber = PlayerState->GetPlayerInputValue();
-		FString ComputerNumber = GameState->GetComputerNumber();
+		FString PlayerNumber = NBPlayerState->GetPlayerInputValue();
+		FString ComputerNumber = NBGameState->GetComputerNumber();
 		if (ComputerNumber[i] == PlayerNumber[i])
 		{
 			Strike++;
@@ -78,23 +78,38 @@ FString ANBGameMode::JudgePlayResult(const FName& UserName)
 		}
 	}
 
-	GameState->SetStrikeCount(Strike);
-	GameState->SetBallCount(Ball);
-	GameState->SetOutCount(Out);
+	NBGameState->SetStrikeCount(Strike);
+	NBGameState->SetBallCount(Ball);
+	NBGameState->SetOutCount(Out);
 
 	// 승리 조건
 	if (Strike == 3)
 	{
-		const uint8 WinScore = PlayerState->GetWinScore();
-		PlayerState->SetWinScore(WinScore+1);
+		const uint8 WinScore = NBPlayerState->GetWinScore();
+		NBPlayerState->SetWinScore(WinScore+1);
 		return FString::Printf(TEXT("%d Strike, %d Ball, Winner is %s "), Strike, Ball, *UserName.ToString());	
 	}
 		
 	return FString::Printf(TEXT("%d Strike, %d Ball"), Strike, Ball);
 }
 
+void ANBGameMode::JudgePlay(const FName& UserName) const
+{
+	const FString Result = JudgePlayResult(UserName);
+	BroadcastPlayResult(Result);
+}
 
-void ANBGameMode::AssignDefaultUserName(const APlayerController* NewPlayer)
+void ANBGameMode::BroadcastPlayResult(const FString& Result) const 
+{
+	auto* NBGameState = GetGameState<ANBGameState>();
+	if (NBGameState)
+	{
+		NBGameState->AddProgressLog(Result);
+	}
+}
+
+
+void ANBGameMode::AssignDefaultUserName(const APlayerController* NewPlayer) const
 {
 	int32 ClientConnectionCount;
 	auto* NetDriver = NewPlayer->GetNetDriver();
@@ -108,29 +123,29 @@ void ANBGameMode::AssignDefaultUserName(const APlayerController* NewPlayer)
 	}
 	const int32 PlayerCount = ClientConnectionCount + 1;
 	
-	auto* PlayerController = Cast<ANBPlayerController>(NewPlayer);
-	if (PlayerController)
+	auto* NBPlayerController = Cast<ANBPlayerController>(NewPlayer);
+	if (NBPlayerController)
 	{
-		auto* PlayerState = PlayerController->GetPlayerState<ANBPlayerState>();
-		if (PlayerState)
+		auto* NBPlayerState = NBPlayerController->GetPlayerState<ANBPlayerState>();
+		if (NBPlayerState)
 		{
 			const FName UserName = FName(FString::Printf(TEXT("Player%d"), PlayerCount));
-			PlayerState->SetUserName(UserName);
-			NB_LOG(LogBaseBall, Log, TEXT("UserName:%s"), *PlayerState->GetUserName().ToString());
+			NBPlayerState->SetUserName(UserName);
+			NB_LOG(LogBaseBall, Log, TEXT("UserName:%s"), *NBPlayerState->GetUserName().ToString());
 		}
 	}
 }
 
 void ANBGameMode::AddPlayerStatesToMap(const APlayerController* NewPlayer)
 {
-	auto* PlayerController = Cast<ANBPlayerController>(NewPlayer);
-	if (PlayerController)
+	auto* NBPlayerController = Cast<ANBPlayerController>(NewPlayer);
+	if (NBPlayerController)
 	{
-		auto* PlayerState = PlayerController->GetPlayerState<ANBPlayerState>();
-		if (PlayerState)
+		auto* NBPlayerState = NBPlayerController->GetPlayerState<ANBPlayerState>();
+		if (NBPlayerState)
 		{
-			const FName UserName = PlayerState->GetUserName();
-			PlayerStates.Add(UserName, PlayerState);
+			const FName UserName = NBPlayerState->GetUserName();
+			PlayerStates.Add(UserName, NBPlayerState);
 		}
 	}
 }

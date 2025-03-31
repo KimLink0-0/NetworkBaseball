@@ -17,15 +17,15 @@ void UNBScoreWidget::NativeConstruct()
 
 void UNBScoreWidget::UpdateScreen()
 {
-	const auto* GameState = Cast<ANBGameState>(GetWorld()->GetGameState());
-	if (!GameState)
+	const auto* NBGameState = Cast<ANBGameState>(GetWorld()->GetGameState());
+	if (!NBGameState)
 	{
 		return;
 	}
 	
-	const uint8 StrikeCount = GameState->GetStrikeCount();
-	const uint8 BallCount = GameState->GetBallCount();
-	const uint8 OutCount = GameState->GetOutCount();
+	const uint8 StrikeCount = NBGameState->GetStrikeCount();
+	const uint8 BallCount = NBGameState->GetBallCount();
+	const uint8 OutCount = NBGameState->GetOutCount();
 	
 	for (int32 i = 0; i < StrikeCount; i++)
 	{

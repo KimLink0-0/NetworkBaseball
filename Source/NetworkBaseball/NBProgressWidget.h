@@ -17,11 +17,17 @@ class NETWORKBASEBALL_API UNBProgressWidget : public UUserWidget
 
 public:
 	void ResetInputMessage() const;
+	bool IsChatInput(const FText& NewInput) const;
+	void SendChatLog(const FText& InputText);
+	void SendProgressLog(const FText& InputText);
 	
 	UFUNCTION()
 	void SendMessageOnEnter(const FText& MessageFormText, ETextCommit::Type CommitMethod);
 	UFUNCTION()
 	void SendMessageOnClick();
+
+	void UpdateProgressLog() const;
+	void UpdateChatLog() const;
 	
 
 protected:

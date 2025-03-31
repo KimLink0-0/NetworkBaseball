@@ -15,7 +15,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UUserWidget> ProgressWidget;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UUserWidget> SBOScreenWidget;
+	TObjectPtr<UUserWidget> ScoreWidget;
 
 	virtual void NativeConstruct() override;
 };

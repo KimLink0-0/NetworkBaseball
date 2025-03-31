@@ -21,10 +21,12 @@ public:
 
 	// Game Rule
 	void GenerateComputerNumber() const;
-	FString JudgePlayResult(const FName& UserName);
+	FString JudgePlayResult(const FName& UserName) const;
+	void JudgePlay(const FName& UserName) const;
+	void BroadcastPlayResult(const FString& Result) const;
 	
 	// Add Player
-	void AssignDefaultUserName(const APlayerController* NewPlayer);
+	void AssignDefaultUserName(const APlayerController* NewPlayer) const;
 	void AddPlayerStatesToMap(const APlayerController* NewPlayer);
 
 protected:

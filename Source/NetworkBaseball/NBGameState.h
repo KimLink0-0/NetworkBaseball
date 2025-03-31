@@ -28,11 +28,23 @@ public:
 	void SetTurnCount(const uint8& NewValue) { TurnCount = NewValue; }
 	FString GetComputerNumber() const { return CurrentTurnComputerNumber; }
 	void SetComputerNumber(const FString& NewValue) { CurrentTurnComputerNumber = NewValue; }
+	TArray<FString> GetChatLog() const { return ServerChatLog; }
+	TArray<FString> GetProgressLog() const { return ServerProgressLog; }
+	
+	void AddChatLog(const FString& NewChat) { ServerChatLog.Add(NewChat); }
+	void AddProgressLog(const FString& NewProgress) { ServerProgressLog.Add(NewProgress); }
 
 	// Reset
 	void ResetStrikeCount() { StrikeCount = 0; }
 	void ResetBallCount() { BallCount = 0; }
 	void ResetOutCount() { OutCount = 0; }
+	void ResetChatLog() { ServerChatLog.Empty(); }
+	void ResetProgressLog() { ServerProgressLog.Empty();}
+
+	// Request
+	void RequestUpdateProgressLog() const;
+	void RequestUpdateScoreIcons() const;
+	void RequestUpdateChatLog() const;
 
 	// Replication
 	UFUNCTION()
@@ -45,6 +57,11 @@ public:
 	void OnRep_TurnCount();
 	UFUNCTION()
 	void OnRep_ComputerNumber();
+	UFUNCTION()
+	void OnRep_ChatLog() const;
+	UFUNCTION()
+	void OnRep_ProgressLog() const;
+	
 	
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_StrikeCount)
@@ -57,7 +74,11 @@ protected:
 	uint8 TurnCount;
 	UPROPERTY(ReplicatedUsing = OnRep_ComputerNumber)
 	FString CurrentTurnComputerNumber;
-
+	UPROPERTY(ReplicatedUsing = OnRep_ChatLog)
+	TArray<FString> ServerChatLog;
+	UPROPERTY(ReplicatedUsing = OnRep_ProgressLog)
+	TArray<FString> ServerProgressLog;
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 };
