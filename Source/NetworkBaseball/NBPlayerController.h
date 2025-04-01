@@ -18,27 +18,18 @@ public:
 
 	TObjectPtr<UNBHUDWidget> GetHUDWidgetInstance() const { return HUDWidgetInstance; }
 
+	// Widget 
+	void UpdateProgressLog() const;
 	void UpdateScoreIcons() const;
 	void UpdateChatLog() const;
-	void UpdateProgressLog() const;
-	void ReceivedMessageMessage(const FText& MessageText) const;
+	void ResetScoreIcons();
+	
+	void SendMessageToGameMode(const FName UserName, const FText& MessageText) const;
 	void CleanInputTextBox() const;
 
 	// RPC
 	UFUNCTION(Server, Reliable)
-	void ServerRPCRequestUpdateScoreIcons();
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCUpdateScoreIcons();
-	UFUNCTION(Server, Reliable)
-	void ServerRPCRequestUpdateProgressLog();
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCUpdateProgressLog();
-	UFUNCTION(Server, Reliable)
-	void ServerRPCRequestUpdateChatLog();
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCUpdateChatLog();
-	UFUNCTION(Server, Reliable)
-	void ServerRPCSendMessage(const FText& MessageText);
+	void ServerRPCSendMessage(const FName UserName, const FText& MessageText);
 	UFUNCTION(Client, Reliable)
 	void ClientRPCRequestCleanInputTextBox();
 	

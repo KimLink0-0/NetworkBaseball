@@ -25,7 +25,7 @@ public:
 	void SetWinScore(const uint8& NewWinScore) { WinScore = NewWinScore; }
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_UserName)
 	FName UserName;
 
 	UPROPERTY()
@@ -36,4 +36,10 @@ protected:
 
 	UPROPERTY()
 	uint8 WinScore;
+
+	UFUNCTION()
+	void OnRep_UserName();
+
+	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

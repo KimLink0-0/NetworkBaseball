@@ -41,7 +41,90 @@ void ANBGameMode::GenerateComputerNumber() const
 	}
 }
 
-FString ANBGameMode::JudgePlayResult(const FName& UserName) const
+void ANBGameMode::ReceivedInputMessage(const FName& UserName, const FText& NewInput)
+{
+	if (IsChatInput(NewInput))
+	{
+		SendChatToState(UserName, NewInput);
+	}
+	else
+	{
+		JudgePlay(UserName, NewInput);
+		SendProgressToState(UserName, NewInput);
+		GenerateComputerNumber();
+	}
+}
+
+bool ANBGameMode::IsChatInput(const FText& NewInput) const
+{
+	const FString InputToString = NewInput.ToString();
+	if (InputToString.Len() != 4 || !InputToString.StartsWith(TEXT("/")))
+	{
+		return true;
+	}
+	
+	TArray<int32> ValidRangeNumbers;
+	for (int32 i = 1; i <= 9; i++)
+	{
+		ValidRangeNumbers.Add(i);
+	}
+
+	for (int32 i = 1; i < 4; i++)
+	{
+		FString ExtractedChar = InputToString.Mid(i,1);
+		int32 Number = FCString::Atoi(*ExtractedChar);
+		if (!ValidRangeNumbers.Contains(Number))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void ANBGameMode::SendChatToState(const FName& UserName, const FText& NewInput)
+{
+	if (NewInput.IsEmpty())
+	{
+		return;
+	}
+	const auto* NBPlayerState = GetPlayerStates(UserName);
+	if (!NBPlayerState)
+	{
+		return;
+	}
+	
+	const FString MessageToString = NewInput.ToString();
+	auto* NBGameState = GetWorld()->GetGameState<ANBGameState>();
+	if (NBGameState)
+	{
+		const FString MessageToSend = FString::Printf(TEXT("[%s]:%s"), *UserName.ToString(), *MessageToString);
+		NBGameState->AddChatLog(MessageToSend);
+	}
+}
+
+void ANBGameMode::SendProgressToState(const FName& UserName, const FText& NewInput)
+{
+	if (NewInput.IsEmpty())
+	{
+		return;
+	}
+	const auto* NBPlayerState = GetPlayerStates(UserName);
+	if (!NBPlayerState)
+	{
+		return;
+	}
+	
+	const FString MessageToString = NewInput.ToString().Mid(1);
+	auto* NBGameState = GetWorld()->GetGameState<ANBGameState>();
+	if (NBGameState)
+	{
+		FString ComputerNumber = NBGameState->GetComputerNumber();
+		const FString MessageToSend = FString::Printf(TEXT("[%s]:%s vs %s"), *UserName.ToString(), *MessageToString, *ComputerNumber);
+		NBGameState->AddProgressLog(MessageToSend);
+	}
+}
+
+FString ANBGameMode::JudgePlayResult(const FName& UserName, const FText& NewInput) const
 {
 	auto* NBPlayerState = GetPlayerStates(UserName);
 	if (!NBPlayerState)
@@ -58,24 +141,28 @@ FString ANBGameMode::JudgePlayResult(const FName& UserName) const
 		
 	for (int32 i = 0; i < 3; ++i)
 	{
-		FString PlayerNumber = NBPlayerState->GetPlayerInputValue();
 		FString ComputerNumber = NBGameState->GetComputerNumber();
-		if (ComputerNumber[i] == PlayerNumber[i])
+		if (!NewInput.IsEmpty() || !ComputerNumber.IsEmpty())
 		{
-			Strike++;
-		}
-		else
-		{
-			const FString UserNumber = FString::Chr(PlayerNumber[i]);
-			if (ComputerNumber.Contains(UserNumber))
+			FString PlayerNumber = NewInput.ToString().Mid(1);
+			if (ComputerNumber[i] == PlayerNumber[i])
 			{
-				Ball++;
+				Strike++;
 			}
 			else
 			{
-				Out++;
+				const FString UserNumber = FString::Chr(PlayerNumber[i]);
+				if (ComputerNumber.Contains(UserNumber))
+				{
+					Ball++;
+				}
 			}
 		}
+	}
+	
+	if (Strike == 0 && Ball == 0)
+	{
+		Out = 1;
 	}
 
 	NBGameState->SetStrikeCount(Strike);
@@ -95,9 +182,9 @@ FString ANBGameMode::JudgePlayResult(const FName& UserName) const
 	return FString::Printf(TEXT("%d Strike, %d Ball"), Strike, Ball);
 }
 
-void ANBGameMode::JudgePlay(const FName& UserName) const
+void ANBGameMode::JudgePlay(const FName& UserName, const FText& NewInput) const
 {
-	const FString Result = JudgePlayResult(UserName);
+	const FString Result = JudgePlayResult(UserName, NewInput);
 	BroadcastPlayResult(Result);
 }
 
@@ -159,6 +246,13 @@ void ANBGameMode::PostLogin(APlayerController* NewPlayer)
 	AssignDefaultUserName(NewPlayer);
 	AddPlayerStatesToMap(NewPlayer);
 
+}
+
+void ANBGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GenerateComputerNumber();
 }
 
 

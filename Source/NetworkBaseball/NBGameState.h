@@ -34,18 +34,23 @@ public:
 	void AddChatLog(const FString& NewChat);
 	void AddProgressLog(const FString& NewProgress);
 
+	
 	// Reset
 	void ResetStrikeCount() { StrikeCount = 0; }
 	void ResetBallCount() { BallCount = 0; }
 	void ResetOutCount() { OutCount = 0; }
 	void ResetChatLog() { ServerChatLog.Empty(); }
 	void ResetProgressLog() { ServerProgressLog.Empty();}
+	void ResetScoreIcons();
+	void TimerResetScoreIcons();
 
+	
 	// Request
+	void RequestUpdateChatLog() const;
 	void RequestUpdateProgressLog() const;
 	void RequestUpdateScoreIcons() const;
-	void RequestUpdateChatLog() const;
 
+	
 	// Replication
 	UFUNCTION()
 	void OnRep_StrikeCount();
@@ -61,6 +66,8 @@ public:
 	void OnRep_ChatLog() const;
 	UFUNCTION()
 	void OnRep_ProgressLog() const;
+	UFUNCTION()
+	void OnRep_CanProgress();
 	
 	
 protected:
@@ -78,6 +85,9 @@ protected:
 	TArray<FString> ServerChatLog;
 	UPROPERTY(ReplicatedUsing = OnRep_ProgressLog)
 	TArray<FString> ServerProgressLog;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CanProgress)
+	bool bCanProgress;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

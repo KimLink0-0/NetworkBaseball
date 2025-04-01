@@ -14,6 +14,7 @@ ANBGameState::ANBGameState()
 	OutCount = 0;
 	TurnCount = 0;
 	CurrentTurnComputerNumber = TEXT("");
+	bCanProgress = true;
 }
 
 void ANBGameState::AddChatLog(const FString& NewChat)
@@ -21,56 +22,69 @@ void ANBGameState::AddChatLog(const FString& NewChat)
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 	
 	ServerChatLog.Add(NewChat);
-
+	RequestUpdateChatLog();
+	
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBGameState::AddProgressLog(const FString& NewProgress)
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
+
+
 	ServerProgressLog.Add(NewProgress);
-
+	RequestUpdateProgressLog();
+	RequestUpdateScoreIcons();
+	TimerResetScoreIcons();
+	
+	
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ANBGameState::RequestUpdateProgressLog() const
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	auto* NBPlayerController = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (NBPlayerController)
-	{
-		NBPlayerController->ServerRPCRequestUpdateProgressLog();
-	}
 
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+void ANBGameState::ResetScoreIcons()
+{
+	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (CurrentInstancePlayer)
+	{
+		CurrentInstancePlayer->ResetScoreIcons();
+	}
 }
 
-void ANBGameState::RequestUpdateScoreIcons() const
+void ANBGameState::TimerResetScoreIcons()
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	auto* NBPlayerController = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (NBPlayerController)
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
 	{
-		NBPlayerController->ServerRPCRequestUpdateScoreIcons();
-	}
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+		ResetScoreIcons();
+	}),3.0f, false, -1);
 }
 
 void ANBGameState::RequestUpdateChatLog() const
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	auto* NBPlayerController = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (NBPlayerController)
+	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (CurrentInstancePlayer)
 	{
-		NBPlayerController->ServerRPCRequestUpdateChatLog();
+		CurrentInstancePlayer->UpdateChatLog();
 	}
+}
 
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+void ANBGameState::RequestUpdateProgressLog() const
+{
+	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (CurrentInstancePlayer)
+	{
+		CurrentInstancePlayer->UpdateProgressLog();
+	}
+}
+
+void ANBGameState::RequestUpdateScoreIcons() const
+{
+	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (CurrentInstancePlayer)
+	{
+		CurrentInstancePlayer->UpdateScoreIcons();
+	}
 }
 
 void ANBGameState::OnRep_StrikeCount()
@@ -91,6 +105,11 @@ void ANBGameState::OnRep_TurnCount()
 
 void ANBGameState::OnRep_ComputerNumber()
 {
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
+
+	TimerResetScoreIcons();
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBGameState::OnRep_ChatLog() const
@@ -112,6 +131,10 @@ void ANBGameState::OnRep_ProgressLog() const
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
+void ANBGameState::OnRep_CanProgress()
+{
+}
+
 void ANBGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -123,4 +146,5 @@ void ANBGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(ANBGameState, CurrentTurnComputerNumber);
 	DOREPLIFETIME(ANBGameState, ServerChatLog);
 	DOREPLIFETIME(ANBGameState, ServerProgressLog);
+	DOREPLIFETIME(ANBGameState, bCanProgress);
 }

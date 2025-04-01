@@ -3,6 +3,8 @@
 
 #include "NBPlayerController.h"
 
+#include "NBGameMode.h"
+#include "NBGameState.h"
 #include "NBHUDWidget.h"
 #include "NBProgressWidget.h"
 #include "NBScoreWidget.h"
@@ -18,23 +20,37 @@ ANBPlayerController::ANBPlayerController()
 	HUDWidgetInstance = nullptr;
 }
 
+void ANBPlayerController::UpdateProgressLog() const
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
+	
+	
+	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
+	if (HUDWidget)
+	{
+		UNBProgressWidget* ProgressWidget = HUDWidget->ProgressWidget;
+		if (ProgressWidget)
+		{
+			ProgressWidget->UpdateProgressLog();
+		}	
+	}
+	
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+}
 
 void ANBPlayerController::UpdateScoreIcons() const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (CurrentInstancePlayer)
+	
+	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
+	if (HUDWidget)
 	{
-		UNBHUDWidget* HUDWidget = CurrentInstancePlayer->GetHUDWidgetInstance();
-		if (HUDWidget)
+		UNBScoreWidget* ScoreWidget = HUDWidget->ScoreWidget;
+		if (ScoreWidget)
 		{
-			UNBScoreWidget* ScoreWidget = HUDWidget->ScoreWidget;
-			if (ScoreWidget)
-			{
-				ScoreWidget->UpdateScreen();
-			}	
-		}
+			ScoreWidget->UpdateScreen();
+		}	
 	}
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
@@ -43,62 +59,43 @@ void ANBPlayerController::UpdateScoreIcons() const
 void ANBPlayerController::UpdateChatLog() const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (CurrentInstancePlayer)
+	
+	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
+	if (HUDWidget)
 	{
-		UNBHUDWidget* HUDWidget = CurrentInstancePlayer->GetHUDWidgetInstance();
-		if (HUDWidget)
+		UNBProgressWidget* ProgressWidget = HUDWidget->ProgressWidget;
+		if (ProgressWidget)
 		{
-			UNBProgressWidget* ProgressWidget = HUDWidget->ProgressWidget;
-			if (ProgressWidget)
-			{
-				ProgressWidget->UpdateChatLog();
-			}	
-		}
+			ProgressWidget->UpdateChatLog();
+		}	
 	}
 	
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ANBPlayerController::UpdateProgressLog() const
+void ANBPlayerController::ResetScoreIcons()
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (CurrentInstancePlayer)
+	
+	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
+	if (HUDWidget)
 	{
-		UNBHUDWidget* HUDWidget = CurrentInstancePlayer->GetHUDWidgetInstance();
-		if (HUDWidget)
+		UNBScoreWidget* ScoreWidget = HUDWidget->ScoreWidget;
+		if (ScoreWidget)
 		{
-			UNBProgressWidget* ProgressWidget = HUDWidget->ProgressWidget;
-			if (ProgressWidget)
-			{
-				ProgressWidget->UpdateChatLog();
-			}	
-		}
+			ScoreWidget->ResetScreen();
+		}	
 	}
-
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ANBPlayerController::ReceivedMessageMessage(const FText& MessageText) const
+void ANBPlayerController::SendMessageToGameMode(const FName UserName, const FText& MessageText) const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
-	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (CurrentInstancePlayer)
+	auto* NBGameMode = Cast<ANBGameMode>(GetWorld()->GetAuthGameMode());
+	if (NBGameMode)
 	{
-		UNBHUDWidget* HUDWidget = CurrentInstancePlayer->GetHUDWidgetInstance();
-		if (HUDWidget)
-		{
-			UNBProgressWidget* ProgressWidget = HUDWidget->ProgressWidget;
-			if (ProgressWidget)
-			{
-				ProgressWidget->ReceivedRPCOnEvent(MessageText);
-			}	
-		}
+		NBGameMode->ReceivedInputMessage(UserName, MessageText);
 	}
 	
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
@@ -125,68 +122,12 @@ void ANBPlayerController::CleanInputTextBox() const
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ANBPlayerController::MulticastRPCUpdateScoreIcons_Implementation()
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	UpdateScoreIcons();
 
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::ServerRPCRequestUpdateScoreIcons_Implementation()
+void ANBPlayerController::ServerRPCSendMessage_Implementation(const FName UserName, const FText& MessageText)
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
-	UpdateScoreIcons();
-	MulticastRPCUpdateScoreIcons();
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::MulticastRPCUpdateProgressLog_Implementation()
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	UpdateProgressLog();
-	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::ServerRPCRequestUpdateProgressLog_Implementation()
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	UpdateProgressLog();
-	MulticastRPCUpdateProgressLog();
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::ServerRPCRequestUpdateChatLog_Implementation()
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	UpdateChatLog();
-	MulticastRPCUpdateChatLog();
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::MulticastRPCUpdateChatLog_Implementation()
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	UpdateChatLog();
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::ServerRPCSendMessage_Implementation(const FText& MessageText)
-{
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	ReceivedMessageMessage(MessageText);
+	SendMessageToGameMode(UserName, MessageText);
 	ClientRPCRequestCleanInputTextBox();
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
@@ -217,9 +158,7 @@ void ANBPlayerController::InitWidget() const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 	
-	UpdateProgressLog();
-	UpdateChatLog();
-	UpdateScoreIcons();
+	
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
