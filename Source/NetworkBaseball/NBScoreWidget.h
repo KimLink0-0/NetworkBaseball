@@ -7,6 +7,7 @@
 #include "NBScoreWidget.generated.h"
 
 class UImage;
+class UTextBlock;
 
 UCLASS()
 class NETWORKBASEBALL_API UNBScoreWidget : public UUserWidget
@@ -16,9 +17,13 @@ class NETWORKBASEBALL_API UNBScoreWidget : public UUserWidget
 public:
 	void UpdateScreen();
 	void ResetScreen();
+	void UpdateScoreText();
 
 protected:
 	virtual void NativeConstruct() override;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> ScoreText; 
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> StrikeIcon1;

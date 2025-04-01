@@ -23,19 +23,31 @@ public:
 	void SetPlayerInputValue(const FString& NewInputValue) { PlayerInputValue = NewInputValue; }
 	uint8 GetWinScore() const { return WinScore; }
 	void SetWinScore(const uint8& NewWinScore) { WinScore = NewWinScore; }
+	uint8 GetGameCount() const { return GameCount; }
+	void SetGameCount(const uint8& NewGameCount);
+	
+	void ResetTurnCount() { TurnCount = 0; }
+
+	void RequestNextGame();
+	
+	UFUNCTION()
+	void OnRep_WinScore();
+	UFUNCTION()
+	void OnRep_GameCount();
+	UFUNCTION()
+	void OnRep_TurnCount();
 	
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_UserName)
 	FName UserName;
-
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_TurnCount)
 	uint8 TurnCount;
-	
 	UPROPERTY()
 	FString PlayerInputValue;
-
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_WinScore)
 	uint8 WinScore;
+	UPROPERTY(ReplicatedUsing = OnRep_GameCount)
+	uint8 GameCount;
 
 	UFUNCTION()
 	void OnRep_UserName();

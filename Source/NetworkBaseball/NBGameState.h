@@ -41,8 +41,8 @@ public:
 	void ResetOutCount() { OutCount = 0; }
 	void ResetChatLog() { ServerChatLog.Empty(); }
 	void ResetProgressLog() { ServerProgressLog.Empty();}
-	void ResetScoreIcons();
-	void TimerResetScoreIcons();
+	void ResetScoreIcons() const;
+	void TimerResetScoreIcons() const;
 
 	
 	// Request
@@ -66,8 +66,6 @@ public:
 	void OnRep_ChatLog() const;
 	UFUNCTION()
 	void OnRep_ProgressLog() const;
-	UFUNCTION()
-	void OnRep_CanProgress();
 	
 	
 protected:
@@ -85,9 +83,7 @@ protected:
 	TArray<FString> ServerChatLog;
 	UPROPERTY(ReplicatedUsing = OnRep_ProgressLog)
 	TArray<FString> ServerProgressLog;
-
-	UPROPERTY(ReplicatedUsing = OnRep_CanProgress)
-	bool bCanProgress;
+	
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

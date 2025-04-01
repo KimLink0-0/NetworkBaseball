@@ -4,16 +4,10 @@
 #include "NBScoreWidget.h"
 
 #include "NBGameState.h"
+#include "NBPlayerController.h"
+#include "NBPlayerState.h"
 #include "Components/Image.h"
-
-void UNBScoreWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	StrikeIcons = { StrikeIcon1, StrikeIcon2, StrikeIcon3 };
-	BallIcons = { BallIcon1, BallIcon2, BallIcon3, BallIcon4 };
-	OutIcons = { OutIcon1, OutIcon2, OutIcon3 };
-}
+#include "Components/TextBlock.h"
 
 void UNBScoreWidget::UpdateScreen()
 {
@@ -65,6 +59,46 @@ void UNBScoreWidget::ResetScreen()
 	{
 		OutIcons[i]->SetColorAndOpacity(FLinearColor(0.46, 0.46, 0.46, 1.0));
 	}
+}
+
+void UNBScoreWidget::UpdateScoreText()
+{
+	auto* PlayerController = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController)
+	{
+		auto* NBPlayerState = PlayerController->GetPlayerState<ANBPlayerState>();
+		if (NBPlayerState)
+		{
+			const FString UserName = NBPlayerState->GetUserName().ToString();
+			const uint8 GameCount = NBPlayerState->GetGameCount();
+			const uint8 WinScore = NBPlayerState->GetWinScore();
+
+			const FString CurrentScore = FString::Printf(TEXT("%s GameCount:%d WinScore:%d"), *UserName, GameCount, WinScore);
+			const FText CurrentScoreToText = FText::FromString(CurrentScore);
+			ScoreText->SetText(CurrentScoreToText);
+		}
+	}
+}
+
+void UNBScoreWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	ensure(ScoreText);
+	ensure(StrikeIcon1);
+	ensure(StrikeIcon2);
+	ensure(StrikeIcon3);
+	ensure(BallIcon1);
+	ensure(BallIcon2);
+	ensure(BallIcon3);
+	ensure(BallIcon4);
+	ensure(OutIcon1);
+	ensure(OutIcon2);
+	ensure(OutIcon3);
+
+	StrikeIcons = { StrikeIcon1, StrikeIcon2, StrikeIcon3 };
+	BallIcons = { BallIcon1, BallIcon2, BallIcon3, BallIcon4 };
+	OutIcons = { OutIcon1, OutIcon2, OutIcon3 };
 }
 
 

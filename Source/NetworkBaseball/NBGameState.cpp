@@ -14,7 +14,6 @@ ANBGameState::ANBGameState()
 	OutCount = 0;
 	TurnCount = 0;
 	CurrentTurnComputerNumber = TEXT("");
-	bCanProgress = true;
 }
 
 void ANBGameState::AddChatLog(const FString& NewChat)
@@ -42,7 +41,7 @@ void ANBGameState::AddProgressLog(const FString& NewProgress)
 }
 
 
-void ANBGameState::ResetScoreIcons()
+void ANBGameState::ResetScoreIcons() const
 {
 	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (CurrentInstancePlayer)
@@ -51,7 +50,7 @@ void ANBGameState::ResetScoreIcons()
 	}
 }
 
-void ANBGameState::TimerResetScoreIcons()
+void ANBGameState::TimerResetScoreIcons() const
 {
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
@@ -107,7 +106,7 @@ void ANBGameState::OnRep_ComputerNumber()
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
-	TimerResetScoreIcons();
+	
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
@@ -127,13 +126,11 @@ void ANBGameState::OnRep_ProgressLog() const
 	
 	RequestUpdateProgressLog();
 	RequestUpdateScoreIcons();
+	TimerResetScoreIcons();
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
-void ANBGameState::OnRep_CanProgress()
-{
-}
 
 void ANBGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -146,5 +143,4 @@ void ANBGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(ANBGameState, CurrentTurnComputerNumber);
 	DOREPLIFETIME(ANBGameState, ServerChatLog);
 	DOREPLIFETIME(ANBGameState, ServerProgressLog);
-	DOREPLIFETIME(ANBGameState, bCanProgress);
 }

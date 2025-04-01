@@ -6,6 +6,7 @@
 #include "NBGameMode.h"
 #include "NBGameState.h"
 #include "NBHUDWidget.h"
+#include "NBPlayerState.h"
 #include "NBProgressWidget.h"
 #include "NBScoreWidget.h"
 #include "NetworkBaseball.h"
@@ -73,6 +74,23 @@ void ANBPlayerController::UpdateChatLog() const
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
+void ANBPlayerController::UpdateScoreText() const
+{
+	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (CurrentInstancePlayer)
+	{
+		UNBHUDWidget* HUDWidget = CurrentInstancePlayer->GetHUDWidgetInstance();
+		if (HUDWidget)
+		{
+			UNBScoreWidget* ScoreWidget = HUDWidget->ScoreWidget;
+			if (ScoreWidget)
+			{
+				ScoreWidget->UpdateScoreText();
+			}	
+		}
+	}
+}
+
 void ANBPlayerController::ResetScoreIcons()
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
@@ -86,6 +104,13 @@ void ANBPlayerController::ResetScoreIcons()
 			ScoreWidget->ResetScreen();
 		}	
 	}
+	
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ANBPlayerController::ResetTurnCount()
+{
+	GetPlayerState<ANBPlayerState>()->ResetTurnCount();
 }
 
 void ANBPlayerController::SendMessageToGameMode(const FName UserName, const FText& MessageText) const
@@ -95,7 +120,12 @@ void ANBPlayerController::SendMessageToGameMode(const FName UserName, const FTex
 	auto* NBGameMode = Cast<ANBGameMode>(GetWorld()->GetAuthGameMode());
 	if (NBGameMode)
 	{
-		NBGameMode->ReceivedInputMessage(UserName, MessageText);
+		ANBPlayerState* NBPlayerState = NBGameMode->GetPlayerStates(UserName);
+		if (NBPlayerState)
+		{
+			NBPlayerState->SetPlayerInputValue(MessageText.ToString());
+			NBGameMode->ReceivedInputMessage(UserName, MessageText);
+		}
 	}
 	
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
@@ -142,6 +172,24 @@ void ANBPlayerController::ClientRPCRequestCleanInputTextBox_Implementation()
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
+void ANBPlayerController::ServerRPCRequestNextGame_Implementation(const FName UserName)
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
+	
+	auto* NBGameMode = Cast<ANBGameMode>(GetWorld()->GetAuthGameMode());
+	if (NBGameMode)
+	{
+		NBGameMode->NextGame(UserName);
+	}
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ANBPlayerController::ClientRPCUpdateScoreText_Implementation()
+{
+	UpdateScoreText();
+}
+
 void ANBPlayerController::NewWidget()
 {
 	if (HUDWidgetClass)
@@ -157,8 +205,11 @@ void ANBPlayerController::NewWidget()
 void ANBPlayerController::InitWidget() const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
-	
+
+	UpdateProgressLog();
+	UpdateScoreIcons();
+	UpdateChatLog();
+	UpdateScoreText();
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
@@ -172,7 +223,13 @@ void ANBPlayerController::BeginPlay()
 	if (IsLocalController())
 	{
 		NewWidget();
-		InitWidget();
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			InitWidget();	
+		}), 0.2f, false, -1);
+		
 	}
 	bShowMouseCursor = true;
 
