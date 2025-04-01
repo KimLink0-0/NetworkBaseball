@@ -29,9 +29,11 @@ public:
 	void SetComputerGenNumber(const FString& NewGenNumber) { ComputerGenNumber = NewGenNumber; }
 
 	void RequestNextGame();
-
 	void UpdateScoreWidget();
 	
+	// OnRep 함수들
+	UFUNCTION()
+	void OnRep_UserName();
 	UFUNCTION()
 	void OnRep_WinScore();
 	UFUNCTION()
@@ -39,8 +41,11 @@ public:
 	UFUNCTION()
 	void OnRep_TurnCount();
 	UFUNCTION()
-	void OnRep_GenNumber();
+	void OnRep_GenNumber(); // 복제 후 UI 갱신 등 처리
 	
+	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_UserName)
 	FName UserName;
@@ -54,10 +59,4 @@ protected:
 	uint8 WinScore;
 	UPROPERTY(ReplicatedUsing = OnRep_GameCount)
 	uint8 GameCount;
-
-	UFUNCTION()
-	void OnRep_UserName();
-
-	virtual void BeginPlay() override;
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

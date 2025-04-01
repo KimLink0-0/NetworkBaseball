@@ -1,35 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "NBPlayerState.h"
 
-#include "NBGameMode.h"
 #include "NBPlayerController.h"
 #include "NetworkBaseball.h"
 #include "Net/UnrealNetwork.h"
-
 
 ANBPlayerState::ANBPlayerState()
 {
 	bOnlyRelevantToOwner = true;
 	
-	UserName = FName(FString::Printf(TEXT("")));
+	UserName = FName(TEXT(""));
 	TurnCount = 0;
 	PlayerInputValue = TEXT("");
 	WinScore = 0;
 	GameCount = 1;
-
+	ComputerGenNumber = TEXT("");
 }
 
 void ANBPlayerState::SetTurnCount(const uint8& NewTurnCount)
 {
 	TurnCount = NewTurnCount;
 	UpdateScoreWidget();
-}
-
-
-void ANBPlayerState::OnRep_UserName()
-{
 }
 
 void ANBPlayerState::SetGameCount(const uint8& NewGameCount)
@@ -49,7 +41,7 @@ void ANBPlayerState::RequestNextGame()
 
 void ANBPlayerState::UpdateScoreWidget()
 {
-	if (GetOwningController()->IsLocalController())
+	if (GetOwningController() && GetOwningController()->IsLocalController())
 	{
 		auto* NBPlayerController = Cast<ANBPlayerController>(GetOwningController());
 		ensure(NBPlayerController);
@@ -57,10 +49,12 @@ void ANBPlayerState::UpdateScoreWidget()
 	}
 }
 
+void ANBPlayerState::OnRep_UserName()
+{
+}
 
 void ANBPlayerState::OnRep_WinScore()
 {
-	
 }
 
 void ANBPlayerState::OnRep_GameCount()
@@ -70,23 +64,19 @@ void ANBPlayerState::OnRep_GameCount()
 
 void ANBPlayerState::OnRep_TurnCount()
 {
-	if (TurnCount == 3)
-	{
-		RequestNextGame();
-	}
 	UpdateScoreWidget();
 }
 
 void ANBPlayerState::OnRep_GenNumber()
 {
+	UpdateScoreWidget();
 }
-
 
 void ANBPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	NB_LOG(LogBaseBall, Log, TEXT("UserName:%s"), *GetUserName().ToString())
+	NB_LOG(LogBaseBall, Log, TEXT("UserName:%s"), *GetUserName().ToString());
 }
 
 void ANBPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -99,6 +89,3 @@ void ANBPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 	DOREPLIFETIME(ANBPlayerState, TurnCount);
 	DOREPLIFETIME(ANBPlayerState, ComputerGenNumber);
 }
-
-
-
