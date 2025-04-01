@@ -28,7 +28,7 @@ public:
 	void SendProgressToState(const FName& UserName, const FText& NewInput) const;
 
 	// Game Rule
-	void GenerateComputerNumber() const;
+	void GenerateComputerNumber(const FName& UserName) const;
 	FString JudgePlayResult(const FName& UserName, const FText& NewInput) const;
 	void JudgePlay(const FName& UserName, const FText& NewInput) const;
 	void BroadcastPlayResult(const FString& Result) const;

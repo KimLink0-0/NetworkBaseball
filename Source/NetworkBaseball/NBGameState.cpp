@@ -13,7 +13,6 @@ ANBGameState::ANBGameState()
 	BallCount = 0;
 	OutCount = 0;
 	TurnCount = 0;
-	CurrentTurnComputerNumber = TEXT("");
 }
 
 void ANBGameState::AddChatLog(const FString& NewChat)
@@ -98,10 +97,6 @@ void ANBGameState::OnRep_TurnCount()
 {
 }
 
-void ANBGameState::OnRep_ComputerNumber()
-{
-}
-
 void ANBGameState::OnRep_ChatLog() const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
@@ -131,7 +126,6 @@ void ANBGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(ANBGameState, BallCount);
 	DOREPLIFETIME(ANBGameState, OutCount);
 	DOREPLIFETIME(ANBGameState, TurnCount);
-	DOREPLIFETIME(ANBGameState, CurrentTurnComputerNumber);
 	DOREPLIFETIME(ANBGameState, ServerChatLog);
 	DOREPLIFETIME(ANBGameState, ServerProgressLog);
 }

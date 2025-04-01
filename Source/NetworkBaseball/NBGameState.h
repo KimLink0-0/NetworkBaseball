@@ -26,8 +26,6 @@ public:
 	void SetOutCount(const uint8& NewValue) { OutCount = NewValue; }
 	uint8 GetTurnCount() const { return TurnCount; }
 	void SetTurnCount(const uint8& NewValue) { TurnCount = NewValue; }
-	FString GetComputerNumber() const { return CurrentTurnComputerNumber; }
-	void SetComputerNumber(const FString& NewValue) { CurrentTurnComputerNumber = NewValue; }
 	TArray<FString> GetChatLog() const { return ServerChatLog; }
 	TArray<FString> GetProgressLog() const { return ServerProgressLog; }
 	
@@ -61,8 +59,6 @@ public:
 	UFUNCTION()
 	void OnRep_TurnCount();
 	UFUNCTION()
-	void OnRep_ComputerNumber();
-	UFUNCTION()
 	void OnRep_ChatLog() const;
 	UFUNCTION()
 	void OnRep_ProgressLog() const;
@@ -77,8 +73,6 @@ protected:
 	uint8 OutCount;
 	UPROPERTY(ReplicatedUsing = OnRep_TurnCount)
 	uint8 TurnCount;
-	UPROPERTY(ReplicatedUsing = OnRep_ComputerNumber)
-	FString CurrentTurnComputerNumber;
 	UPROPERTY(ReplicatedUsing = OnRep_ChatLog)
 	TArray<FString> ServerChatLog;
 	UPROPERTY(ReplicatedUsing = OnRep_ProgressLog)

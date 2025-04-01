@@ -202,9 +202,8 @@ void ANBPlayerController::BeginPlay()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()
 		{
-			InitWidget();	
+			InitWidget();
 		}), 0.2f, false, -1);
-		
 	}
 	bShowMouseCursor = true;
 

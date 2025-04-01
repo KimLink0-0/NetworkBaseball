@@ -3,6 +3,7 @@
 
 #include "NBPlayerState.h"
 
+#include "NBGameMode.h"
 #include "NBPlayerController.h"
 #include "NetworkBaseball.h"
 #include "Net/UnrealNetwork.h"
@@ -76,11 +77,15 @@ void ANBPlayerState::OnRep_TurnCount()
 	UpdateScoreWidget();
 }
 
+void ANBPlayerState::OnRep_GenNumber()
+{
+}
+
 
 void ANBPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	NB_LOG(LogBaseBall, Log, TEXT("UserName:%s"), *GetUserName().ToString())
 }
 
@@ -92,6 +97,7 @@ void ANBPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 	DOREPLIFETIME(ANBPlayerState, GameCount);
 	DOREPLIFETIME(ANBPlayerState, WinScore);
 	DOREPLIFETIME(ANBPlayerState, TurnCount);
+	DOREPLIFETIME(ANBPlayerState, ComputerGenNumber);
 }
 
 

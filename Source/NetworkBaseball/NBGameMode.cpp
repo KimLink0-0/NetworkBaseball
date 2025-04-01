@@ -16,29 +16,31 @@ ANBGameMode::ANBGameMode()
 	
 }
 
-void ANBGameMode::GenerateComputerNumber() const
+void ANBGameMode::GenerateComputerNumber(const FName& UserName) const
 {
-	auto* NBGameState = GetGameState<ANBGameState>();
-	if (NBGameState)
+	auto* NBPlayerState = GetPlayerStates(UserName);
+	ensure(NBPlayerState);
+	
+	
+	TArray<int32> ValidRangeNumbers;
+	for (int32 i = 1; i <= 9; i++)
 	{
-		TArray<int32> ValidRangeNumbers;
-		for (int32 i = 1; i <= 9; i++)
-		{
-			ValidRangeNumbers.Add(i);
-		}
-
-		// 랜덤 초기화
-		FMath::RandInit(FDateTime::Now().GetTicks());
-
-		FString GeneratedResult;
-		for (int32 i = 0; i < 3; i++)
-		{
-			const int32 Index = FMath::RandRange(0, ValidRangeNumbers.Num() - 1);
-			GeneratedResult.Append(FString::FromInt(ValidRangeNumbers[Index]));
-			ValidRangeNumbers.RemoveAt(Index);
-		}
-		NBGameState->SetComputerNumber(GeneratedResult);
+		ValidRangeNumbers.Add(i);
 	}
+
+	// 랜덤 초기화
+	FMath::RandInit(FDateTime::Now().GetTicks());
+
+	
+	FString GeneratedResult;
+	for (int32 i = 0; i < 3; i++)
+	{
+		const int32 Index = FMath::RandRange(0, ValidRangeNumbers.Num() - 1);
+		GeneratedResult.Append(FString::FromInt(ValidRangeNumbers[Index]));
+		ValidRangeNumbers.RemoveAt(Index);
+	}
+	NBPlayerState->SetComputerGenNumber(GeneratedResult);
+	
 }
 
 void ANBGameMode::StartTurn(const FName& UserName) const
@@ -68,7 +70,7 @@ void ANBGameMode::NextGame(const FName& UserName) const
 	
 	PlayerState->SetTurnCount(0);
 	PlayerState->SetGameCount(CurrentGameCount + 1);
-	GenerateComputerNumber();
+	GenerateComputerNumber(UserName);
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
@@ -167,7 +169,7 @@ void ANBGameMode::SendProgressToState(const FName& UserName, const FText& NewInp
 	}
 	else
 	{
-		const FString ComputerNumber = NBGameState->GetComputerNumber();
+		const FString ComputerNumber = NBPlayerState->GetComputerGenNumber();
 		MessageToSend = FString::Printf(TEXT("[%s]:%s vs %s"), *UserName.ToString(), *MessageToString, *ComputerNumber);	
 	}
 	NBGameState->AddProgressLog(MessageToSend);
@@ -181,12 +183,17 @@ FString ANBGameMode::JudgePlayResult(const FName& UserName, const FText& NewInpu
 	auto* NBGameState = GetGameState<ANBGameState>();
 	check(NBPlayerState);
 	check(NBGameState);
+
+	if (NBPlayerState->GetComputerGenNumber().IsEmpty())
+	{
+		GenerateComputerNumber(UserName);
+	}
 	
 	uint8 Strike = 0, Ball = 0, Out = 0;
 		
 	for (int32 i = 0; i < 3; ++i)
 	{
-		FString ComputerNumber = NBGameState->GetComputerNumber();
+		FString ComputerNumber = NBPlayerState->GetComputerGenNumber();
 		if (!NewInput.IsEmpty() || !ComputerNumber.IsEmpty())
 		{
 			FString PlayerNumber = NewInput.ToString().Mid(1);
@@ -290,14 +297,12 @@ void ANBGameMode::PostLogin(APlayerController* NewPlayer)
 
 	AssignDefaultUserName(NewPlayer);
 	AddPlayerStatesToMap(NewPlayer);
-
 }
 
 void ANBGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GenerateComputerNumber();
+	
 }
 
 

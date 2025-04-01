@@ -25,6 +25,8 @@ public:
 	void SetWinScore(const uint8& NewWinScore) { WinScore = NewWinScore; }
 	uint8 GetGameCount() const { return GameCount; }
 	void SetGameCount(const uint8& NewGameCount);
+	FString GetComputerGenNumber() const { return ComputerGenNumber; }
+	void SetComputerGenNumber(const FString& NewGenNumber) { ComputerGenNumber = NewGenNumber; }
 
 	void RequestNextGame();
 
@@ -36,12 +38,16 @@ public:
 	void OnRep_GameCount();
 	UFUNCTION()
 	void OnRep_TurnCount();
+	UFUNCTION()
+	void OnRep_GenNumber();
 	
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_UserName)
 	FName UserName;
 	UPROPERTY(ReplicatedUsing = OnRep_TurnCount)
 	uint8 TurnCount;
+	UPROPERTY(ReplicatedUsing = OnRep_GenNumber)
+	FString ComputerGenNumber;
 	UPROPERTY()
 	FString PlayerInputValue;
 	UPROPERTY(ReplicatedUsing = OnRep_WinScore)
