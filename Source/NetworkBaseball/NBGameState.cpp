@@ -18,17 +18,14 @@ ANBGameState::ANBGameState()
 
 void ANBGameState::AddChatLog(const FString& NewChat)
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 	
 	ServerChatLog.Add(NewChat);
 	RequestUpdateChatLog();
 	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBGameState::AddProgressLog(const FString& NewProgress)
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
 
 	ServerProgressLog.Add(NewProgress);
@@ -37,7 +34,6 @@ void ANBGameState::AddProgressLog(const FString& NewProgress)
 	TimerResetScoreIcons();
 	
 	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 
@@ -104,11 +100,6 @@ void ANBGameState::OnRep_TurnCount()
 
 void ANBGameState::OnRep_ComputerNumber()
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
-	
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBGameState::OnRep_ChatLog() const

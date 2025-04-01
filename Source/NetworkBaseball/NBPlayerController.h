@@ -24,7 +24,6 @@ public:
 	void UpdateChatLog() const;
 	void UpdateScoreText() const;
 	void ResetScoreIcons();
-	void ResetTurnCount();
 	
 	void SendMessageToGameMode(const FName UserName, const FText& MessageText) const;
 	void CleanInputTextBox() const;
@@ -36,8 +35,6 @@ public:
 	void ClientRPCRequestCleanInputTextBox();
 	UFUNCTION(Server, Reliable)
 	void ServerRPCRequestNextGame(const FName UserName);
-	UFUNCTION(Client, Reliable)
-	void ClientRPCUpdateScoreText();
 	
 protected:
 	// Widget

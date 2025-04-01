@@ -20,6 +20,12 @@ ANBPlayerState::ANBPlayerState()
 
 }
 
+void ANBPlayerState::SetTurnCount(const uint8& NewTurnCount)
+{
+	TurnCount = NewTurnCount;
+	UpdateScoreWidget();
+}
+
 
 void ANBPlayerState::OnRep_UserName()
 {
@@ -28,6 +34,7 @@ void ANBPlayerState::OnRep_UserName()
 void ANBPlayerState::SetGameCount(const uint8& NewGameCount)
 {
 	GameCount = NewGameCount;
+	UpdateScoreWidget();
 }
 
 void ANBPlayerState::RequestNextGame()
@@ -39,6 +46,17 @@ void ANBPlayerState::RequestNextGame()
 	}
 }
 
+void ANBPlayerState::UpdateScoreWidget()
+{
+	if (GetOwningController()->IsLocalController())
+	{
+		auto* NBPlayerController = Cast<ANBPlayerController>(GetOwningController());
+		ensure(NBPlayerController);
+		NBPlayerController->UpdateScoreText();
+	}
+}
+
+
 void ANBPlayerState::OnRep_WinScore()
 {
 	
@@ -46,7 +64,7 @@ void ANBPlayerState::OnRep_WinScore()
 
 void ANBPlayerState::OnRep_GameCount()
 {
-	
+	UpdateScoreWidget();
 }
 
 void ANBPlayerState::OnRep_TurnCount()
@@ -55,6 +73,7 @@ void ANBPlayerState::OnRep_TurnCount()
 	{
 		RequestNextGame();
 	}
+	UpdateScoreWidget();
 }
 
 

@@ -18,17 +18,17 @@ public:
 	FName GetUserName() const { return UserName; }
 	void SetUserName(const FName& NewName) { UserName = NewName; }
 	uint8 GetTurnCount() const { return TurnCount; }
-	void SetTurnCount(const uint8& NewTurnCount) { TurnCount = NewTurnCount; }
+	void SetTurnCount(const uint8& NewTurnCount);
 	FString GetPlayerInputValue() const { return PlayerInputValue; }
 	void SetPlayerInputValue(const FString& NewInputValue) { PlayerInputValue = NewInputValue; }
 	uint8 GetWinScore() const { return WinScore; }
 	void SetWinScore(const uint8& NewWinScore) { WinScore = NewWinScore; }
 	uint8 GetGameCount() const { return GameCount; }
 	void SetGameCount(const uint8& NewGameCount);
-	
-	void ResetTurnCount() { TurnCount = 0; }
 
 	void RequestNextGame();
+
+	void UpdateScoreWidget();
 	
 	UFUNCTION()
 	void OnRep_WinScore();

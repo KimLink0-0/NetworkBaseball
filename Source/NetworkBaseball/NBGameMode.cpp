@@ -44,31 +44,33 @@ void ANBGameMode::GenerateComputerNumber() const
 void ANBGameMode::StartTurn(const FName& UserName) const
 {
 	auto* PlayerState = GetPlayerStates(UserName);
-	if (PlayerState)
-	{
-		const uint8 TurnCount = PlayerState->GetTurnCount();
-		PlayerState->SetTurnCount(TurnCount + 1);
-		const FString NewInputToString = PlayerState->GetPlayerInputValue();
-		const FText NewInput = FText::FromString(NewInputToString);
-
-		
-		JudgePlay(UserName, NewInput);
-		SendProgressToState(UserName, NewInput);
-	}
+	ensure(PlayerState);
+	
+	
+	const FString NewInputToString = PlayerState->GetPlayerInputValue();
+	const FText NewInput = FText::FromString(NewInputToString);
+	
+	
+	JudgePlay(UserName, NewInput);
+	SendProgressToState(UserName, NewInput);
 }
 
 void ANBGameMode::NextGame(const FName& UserName) const
 {
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+	
 	auto* PlayerState = GetPlayerStates(UserName);
-	if (PlayerState)
-	{
-		const FString NewInputToString = PlayerState->GetPlayerInputValue();
-		const FText NewInput = FText::FromString(NewInputToString);
+	ensure(PlayerState);
+	
+	const FString NewInputToString = PlayerState->GetPlayerInputValue();
+	const FText NewInput = FText::FromString(NewInputToString);
+	const uint8 CurrentGameCount = PlayerState->GetGameCount();
+	
+	PlayerState->SetTurnCount(0);
+	PlayerState->SetGameCount(CurrentGameCount + 1);
+	GenerateComputerNumber();
 
-		
-		PlayerState->ResetTurnCount();
-		GenerateComputerNumber();
-	}
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBGameMode::ReceivedInputMessage(const FName& UserName, const FText& NewInput) const
@@ -82,29 +84,16 @@ void ANBGameMode::ReceivedInputMessage(const FName& UserName, const FText& NewIn
 	}
 	else
 	{
-		const uint8 CurrentGameCount = PlayerState->GetGameCount();
-		if (CurrentGameCount > MaxGameCount)
-		{
-			return;
-		}
-		
 		const uint8 TurnCount = PlayerState->GetTurnCount();
+		const uint8 NewTurnCount = TurnCount + 1;
 		if (TurnCount < MaxTurnCount)
 		{
-			PlayerState->SetTurnCount(TurnCount + 1);
+			PlayerState->SetTurnCount(NewTurnCount);
 			StartTurn(UserName);
 		}
-		if (TurnCount >= MaxTurnCount)
+		if (NewTurnCount >= MaxTurnCount)
 		{
-			PlayerState->SetGameCount(CurrentGameCount + 1);
 			NextGame(UserName);
-		}
-
-		// 위에 두 if 문에서 TurnCount 변화
-		auto* NBPlayerController = Cast<ANBPlayerController>(PlayerState->GetOwningController());
-		if (NBPlayerController)
-		{
-			NBPlayerController->ClientRPCUpdateScoreText();
 		}
 	}
 }
@@ -141,19 +130,17 @@ void ANBGameMode::SendChatToState(const FName& UserName, const FText& NewInput) 
 	{
 		return;
 	}
+	
 	const auto* NBPlayerState = GetPlayerStates(UserName);
-	if (!NBPlayerState)
-	{
-		return;
-	}
+	auto* NBGameState = GetWorld()->GetGameState<ANBGameState>();
+	
+	ensure(NBPlayerState);
+	ensure(NBGameState);
 	
 	const FString MessageToString = NewInput.ToString();
-	auto* NBGameState = GetWorld()->GetGameState<ANBGameState>();
-	if (NBGameState)
-	{
-		const FString MessageToSend = FString::Printf(TEXT("[%s]:%s"), *UserName.ToString(), *MessageToString);
-		NBGameState->AddChatLog(MessageToSend);
-	}
+	const FString MessageToSend = FString::Printf(TEXT("[%s]:%s"), *UserName.ToString(), *MessageToString);
+	NBGameState->AddChatLog(MessageToSend);
+	
 }
 
 void ANBGameMode::SendProgressToState(const FName& UserName, const FText& NewInput) const
@@ -162,45 +149,38 @@ void ANBGameMode::SendProgressToState(const FName& UserName, const FText& NewInp
 	{
 		return;
 	}
-	const auto* NBPlayerState = GetPlayerStates(UserName);
-	if (!NBPlayerState)
-	{
-		return;
-	}
 	
-	const FString MessageToString = NewInput.ToString().Mid(1);
+	const auto* NBPlayerState = GetPlayerStates(UserName);
 	auto* NBGameState = GetWorld()->GetGameState<ANBGameState>();
-	if (NBGameState)
+	const FString MessageToString = NewInput.ToString().Mid(1);
+	FString MessageToSend;
+	
+	ensure(NBPlayerState);
+	ensure(NBGameState);
+
+	
+	if (NBPlayerState->GetTurnCount() < MaxTurnCount)
 	{
-		FString MessageToSend;
-		if (NBPlayerState->GetTurnCount() < MaxTurnCount)
-		{
-			const uint8 LeftChance = MaxTurnCount - NBPlayerState->GetTurnCount();
-			const FString LeftChanceToString = FString::FromInt(LeftChance);
-			MessageToSend = FString::Printf(TEXT("[%s]:%s Chance:%s"), *UserName.ToString(), *MessageToString, *LeftChanceToString);
-		}
-		else
-		{
-			const FString ComputerNumber = NBGameState->GetComputerNumber();
-			MessageToSend = FString::Printf(TEXT("[%s]:%s vs %s"), *UserName.ToString(), *MessageToString, *ComputerNumber);	
-		}
-		NBGameState->AddProgressLog(MessageToSend);
+		const uint8 LeftChance = MaxTurnCount - NBPlayerState->GetTurnCount();
+		const FString LeftChanceToString = FString::FromInt(LeftChance);
+		MessageToSend = FString::Printf(TEXT("[%s]:%s Chance:%s"), *UserName.ToString(), *MessageToString, *LeftChanceToString);
 	}
+	else
+	{
+		const FString ComputerNumber = NBGameState->GetComputerNumber();
+		MessageToSend = FString::Printf(TEXT("[%s]:%s vs %s"), *UserName.ToString(), *MessageToString, *ComputerNumber);	
+	}
+	NBGameState->AddProgressLog(MessageToSend);
+	
 }
 
 
 FString ANBGameMode::JudgePlayResult(const FName& UserName, const FText& NewInput) const
 {
 	auto* NBPlayerState = GetPlayerStates(UserName);
-	if (!NBPlayerState)
-	{
-		return FString::Printf(TEXT("%s not found %s"), *NBPlayerState->GetUserName().ToString(), *NBPlayerState->GetName());
-	}
 	auto* NBGameState = GetGameState<ANBGameState>();
-	if (!NBGameState)
-	{
-		return FString::Printf(TEXT("%s not found %s"), *NBPlayerState->GetUserName().ToString(), *NBGameState->GetName());
-	}
+	check(NBPlayerState);
+	check(NBGameState);
 	
 	uint8 Strike = 0, Ball = 0, Out = 0;
 		

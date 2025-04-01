@@ -64,20 +64,19 @@ void UNBScoreWidget::ResetScreen()
 void UNBScoreWidget::UpdateScoreText()
 {
 	auto* PlayerController = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PlayerController)
-	{
-		auto* NBPlayerState = PlayerController->GetPlayerState<ANBPlayerState>();
-		if (NBPlayerState)
-		{
-			const FString UserName = NBPlayerState->GetUserName().ToString();
-			const uint8 GameCount = NBPlayerState->GetGameCount();
-			const uint8 WinScore = NBPlayerState->GetWinScore();
+	ensure (PlayerController);
+	
+	auto* NBPlayerState = PlayerController->GetPlayerState<ANBPlayerState>();
+	ensure (NBPlayerState);
+	
+	const FString UserName = NBPlayerState->GetUserName().ToString();
+	const uint8 GameCount = NBPlayerState->GetGameCount();
+	const uint8 WinScore = NBPlayerState->GetWinScore();
 
-			const FString CurrentScore = FString::Printf(TEXT("%s GameCount:%d WinScore:%d"), *UserName, GameCount, WinScore);
-			const FText CurrentScoreToText = FText::FromString(CurrentScore);
-			ScoreText->SetText(CurrentScoreToText);
-		}
-	}
+	const FString CurrentScore = FString::Printf(TEXT("%s GameCount:%d WinScore:%d"), *UserName, GameCount, WinScore);
+	const FText CurrentScoreToText = FText::FromString(CurrentScore);
+	ScoreText->SetText(CurrentScoreToText);
+	
 }
 
 void UNBScoreWidget::NativeConstruct()

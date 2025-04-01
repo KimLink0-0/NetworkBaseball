@@ -23,8 +23,6 @@ ANBPlayerController::ANBPlayerController()
 
 void ANBPlayerController::UpdateProgressLog() const
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-	
 	
 	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
 	if (HUDWidget)
@@ -36,13 +34,10 @@ void ANBPlayerController::UpdateProgressLog() const
 		}	
 	}
 	
-
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::UpdateScoreIcons() const
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 	
 	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
 	if (HUDWidget)
@@ -54,12 +49,10 @@ void ANBPlayerController::UpdateScoreIcons() const
 		}	
 	}
 
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::UpdateChatLog() const
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 	
 	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
 	if (HUDWidget)
@@ -71,11 +64,12 @@ void ANBPlayerController::UpdateChatLog() const
 		}	
 	}
 	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::UpdateScoreText() const
 {
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
+	
 	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (CurrentInstancePlayer)
 	{
@@ -89,11 +83,12 @@ void ANBPlayerController::UpdateScoreText() const
 			}	
 		}
 	}
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::ResetScoreIcons()
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 	
 	UNBHUDWidget* HUDWidget = GetHUDWidgetInstance();
 	if (HUDWidget)
@@ -105,17 +100,10 @@ void ANBPlayerController::ResetScoreIcons()
 		}	
 	}
 	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::ResetTurnCount()
-{
-	GetPlayerState<ANBPlayerState>()->ResetTurnCount();
 }
 
 void ANBPlayerController::SendMessageToGameMode(const FName UserName, const FText& MessageText) const
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
 	auto* NBGameMode = Cast<ANBGameMode>(GetWorld()->GetAuthGameMode());
 	if (NBGameMode)
@@ -128,13 +116,10 @@ void ANBPlayerController::SendMessageToGameMode(const FName UserName, const FTex
 		}
 	}
 	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::CleanInputTextBox() const
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
-
 	auto* CurrentInstancePlayer = Cast<ANBPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (CurrentInstancePlayer)
 	{
@@ -149,27 +134,22 @@ void ANBPlayerController::CleanInputTextBox() const
 		}
 	}
 	
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 
 void ANBPlayerController::ServerRPCSendMessage_Implementation(const FName UserName, const FText& MessageText)
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
 	SendMessageToGameMode(UserName, MessageText);
 	ClientRPCRequestCleanInputTextBox();
 
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::ClientRPCRequestCleanInputTextBox_Implementation()
 {
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
 
 	CleanInputTextBox();
 
-	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
 }
 
 void ANBPlayerController::ServerRPCRequestNextGame_Implementation(const FName UserName)
@@ -183,11 +163,6 @@ void ANBPlayerController::ServerRPCRequestNextGame_Implementation(const FName Us
 	}
 
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
-}
-
-void ANBPlayerController::ClientRPCUpdateScoreText_Implementation()
-{
-	UpdateScoreText();
 }
 
 void ANBPlayerController::NewWidget()
