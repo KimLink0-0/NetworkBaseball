@@ -35,6 +35,10 @@ public:
 	void StartTurn(const FName& UserName) const;
 	void NextGame(const FName& UserName) const;
 
+	//
+	void HandleGameOver(const FName& WinnerUserName, bool bHasWinner) const;
+	FName FindOtherPlayerName(const FName& CurrentUserName) const;
+
 	
 	// Add Player
 	void AssignDefaultUserName(const APlayerController* NewPlayer) const;

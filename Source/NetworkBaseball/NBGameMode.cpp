@@ -194,7 +194,7 @@ FString ANBGameMode::JudgePlayResult(const FName& UserName, const FText& NewInpu
 	for (int32 i = 0; i < 3; ++i)
 	{
 		FString ComputerNumber = NBPlayerState->GetComputerGenNumber();
-		if (!NewInput.IsEmpty() || !ComputerNumber.IsEmpty())
+		if (!NewInput.IsEmpty() && !ComputerNumber.IsEmpty())
 		{
 			FString PlayerNumber = NewInput.ToString().Mid(1);
 			if (ComputerNumber[i] == PlayerNumber[i])
