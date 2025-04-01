@@ -16,10 +16,17 @@ class NETWORKBASEBALL_API UNBProgressWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void ResetInputMessage() const;
+	void ResetInputTextBox() const;
 	bool IsChatInput(const FText& NewInput) const;
+
+	UFUNCTION()
 	void SendChatLog(const FText& InputText);
+	UFUNCTION()
 	void SendProgressLog(const FText& InputText);
+	UFUNCTION()
+	void ReceivedRPCOnEvent(const FText& ReceivedMessage);
+	UFUNCTION()
+	void RequestRPCToServer(const FText& MessageFormText) const;
 	
 	UFUNCTION()
 	void SendMessageOnEnter(const FText& MessageFormText, ETextCommit::Type CommitMethod);

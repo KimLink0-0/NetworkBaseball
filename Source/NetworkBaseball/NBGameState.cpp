@@ -16,6 +16,24 @@ ANBGameState::ANBGameState()
 	CurrentTurnComputerNumber = TEXT("");
 }
 
+void ANBGameState::AddChatLog(const FString& NewChat)
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
+	
+	ServerChatLog.Add(NewChat);
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+}
+
+void ANBGameState::AddProgressLog(const FString& NewProgress)
+{
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));
+	
+	ServerProgressLog.Add(NewProgress);
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("End"));
+}
+
 void ANBGameState::RequestUpdateProgressLog() const
 {
 	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("Begin"));

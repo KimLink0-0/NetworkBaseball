@@ -21,6 +21,8 @@ public:
 	void UpdateScoreIcons() const;
 	void UpdateChatLog() const;
 	void UpdateProgressLog() const;
+	void ReceivedMessageMessage(const FText& MessageText) const;
+	void CleanInputTextBox() const;
 
 	// RPC
 	UFUNCTION(Server, Reliable)
@@ -35,6 +37,10 @@ public:
 	void ServerRPCRequestUpdateChatLog();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCUpdateChatLog();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCSendMessage(const FText& MessageText);
+	UFUNCTION(Client, Reliable)
+	void ClientRPCRequestCleanInputTextBox();
 	
 protected:
 	// Widget

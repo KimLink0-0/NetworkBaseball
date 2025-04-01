@@ -87,9 +87,11 @@ FString ANBGameMode::JudgePlayResult(const FName& UserName) const
 	{
 		const uint8 WinScore = NBPlayerState->GetWinScore();
 		NBPlayerState->SetWinScore(WinScore+1);
+		NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("%d Strike, %d Ball, Winner is %s "), Strike, Ball, *UserName.ToString());
 		return FString::Printf(TEXT("%d Strike, %d Ball, Winner is %s "), Strike, Ball, *UserName.ToString());	
 	}
-		
+
+	NB_LOG(LogBaseBall, Log, TEXT("%s"), TEXT("%d Strike, %d Ball"), Strike, Ball);
 	return FString::Printf(TEXT("%d Strike, %d Ball"), Strike, Ball);
 }
 

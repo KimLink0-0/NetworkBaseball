@@ -10,7 +10,7 @@
 #include "Components/EditableText.h"
 #include "Components/TextBlock.h"
 
-void UNBProgressWidget::ResetInputMessage() const
+void UNBProgressWidget::ResetInputTextBox() const
 {
 	EditableTextWidget->SetText(FText::FromString(TEXT("")));
 }
@@ -85,20 +85,34 @@ void UNBProgressWidget::SendProgressLog(const FText& InputText)
 	}
 }
 
+void UNBProgressWidget::ReceivedRPCOnEvent(const FText& ReceivedMessage)
+{
+
+	if (IsChatInput(ReceivedMessage))
+	{
+		SendChatLog(ReceivedMessage);
+	}
+	else
+	{
+		SendProgressLog(ReceivedMessage);
+	}
+	
+}
+
+void UNBProgressWidget::RequestRPCToServer(const FText& MessageFormText) const
+{
+	auto* NBPlayerController = Cast<ANBPlayerController>(GetOwningPlayer());
+	if (NBPlayerController)
+	{
+		NBPlayerController->ServerRPCSendMessage(MessageFormText);
+	}
+}
+
 void UNBProgressWidget::SendMessageOnEnter(const FText& MessageFormText, ETextCommit::Type CommitMethod)
 {
 	if (CommitMethod == ETextCommit::OnEnter && !MessageFormText.IsEmpty())
 	{
-		if (IsChatInput(MessageFormText))
-		{
-			SendChatLog(MessageFormText);
-		}
-		else
-		{
-			SendProgressLog(MessageFormText);
-		}
-		
-		ResetInputMessage();
+		RequestRPCToServer(MessageFormText);
 	}
 }
 
@@ -107,15 +121,7 @@ void UNBProgressWidget::SendMessageOnClick()
 	const FText MessageFormText = EditableTextWidget->GetText();
 	if (!MessageFormText.IsEmpty())
 	{
-		if (IsChatInput(MessageFormText))
-		{
-			SendChatLog(MessageFormText);
-		}
-		else
-		{
-			SendProgressLog(MessageFormText);
-		}
-		ResetInputMessage();
+		RequestRPCToServer(MessageFormText);
 	}
 }
 

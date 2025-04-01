@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "NBHUDWidget.generated.h"
 
+class UNBProgressWidget;
+class UNBScoreWidget;
+
 UCLASS()
 class NETWORKBASEBALL_API UNBHUDWidget : public UUserWidget
 {
@@ -13,9 +16,9 @@ class NETWORKBASEBALL_API UNBHUDWidget : public UUserWidget
 
 public:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UUserWidget> ProgressWidget;
+	TObjectPtr<UNBProgressWidget> ProgressWidget;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UUserWidget> ScoreWidget;
+	TObjectPtr<UNBScoreWidget> ScoreWidget;
 
 	virtual void NativeConstruct() override;
 };

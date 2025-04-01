@@ -31,8 +31,8 @@ public:
 	TArray<FString> GetChatLog() const { return ServerChatLog; }
 	TArray<FString> GetProgressLog() const { return ServerProgressLog; }
 	
-	void AddChatLog(const FString& NewChat) { ServerChatLog.Add(NewChat); }
-	void AddProgressLog(const FString& NewProgress) { ServerProgressLog.Add(NewProgress); }
+	void AddChatLog(const FString& NewChat);
+	void AddProgressLog(const FString& NewProgress);
 
 	// Reset
 	void ResetStrikeCount() { StrikeCount = 0; }
